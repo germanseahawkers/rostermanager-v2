@@ -1,74 +1,117 @@
 # rostermanager-v2
 
-Lean greenfield rebuild of the legacy roster manager with a clear MVP focus.
+`rostermanager-v2` is a lean PHP/MySQL roster manager for NFL fan projects.
 
-## Chosen direction
+The current product focus is a team-branded 90-to-53 roster cut simulator with a lightweight admin backend for managing players and importing roster data.
 
-Because the target environment is Plesk-style hosting with PHP and SQL, this project now uses:
+## What it does
+
+- Public 53-man roster simulator
+- Team-configurable branding and position groups
+- German and English UI
+- Shareable roster URLs
+- Server-rendered SVG share card
+- Protected admin area
+- Player CRUD
+- CSV roster import
+- Optional local player image import via ZIP
+
+## Stack
 
 - PHP 8.2+
-- MySQL/MariaDB via PDO
+- MySQL or MariaDB
+- PDO
 - Server-rendered views
 - Session-based admin authentication
-- A very small custom application structure instead of a heavy framework
+- Small custom app structure instead of a full framework
 
-This keeps deployment simple and still gives us a clean separation between routing, controllers, business logic, and data access.
+This keeps deployment simple for classic hosting environments such as Plesk while still preserving clean separation between routing, controllers, repositories and helpers.
 
-## MVP scope
+## Project structure
 
-- Public 90-to-53 roster cut simulator
-- Team-configurable branding and position groups
-- German/English language toggle
-- Shareable result URLs
-- Server-generated SVG share card
-- Admin login
-- Player CRUD
-- CSV import for players
+- [`public/`](public/) public web root
+- [`src/`](src/) application code
+- [`config/`](config/) app and team configuration
+- [`database/schema.sql`](database/schema.sql) database schema
+- [`docs/architecture.md`](docs/architecture.md) architecture notes
+- [`docs/import.md`](docs/import.md) roster import workflow
+- [`scripts/import_roster.py`](scripts/import_roster.py) ESPN roster importer
 
-## Reuse for other teams
+## Team configuration
 
-Team-specific values are centralized in [config/team.php](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/config/team.php) and can also be overridden via [.env.example](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/.env.example):
+Team-specific values live in [`config/team.php`](config/team.php) and can also be overridden through [`.env.example`](.env.example).
 
-- team name, city and nickname
+Key settings include:
+
+- team name, city, nickname and slug
 - color palette
 - tagline
 - logo path
 - roster limit
-- position group mapping
+- simulator position-group mapping
 
-## Current structure
-
-- [public](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/public)
-- [src](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/src)
-- [config](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/config)
-- [database](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/database)
-- [docs/architecture.md](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/docs/architecture.md)
-- [docs/import.md](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/docs/import.md)
+That makes the project reusable for other teams without changing the core simulator logic.
 
 ## Setup
 
-1. Point the webroot to [public](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/public).
-2. Create a MySQL database and import [database/schema.sql](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/database/schema.sql).
-3. Configure environment variables based on [.env.example](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/.env.example).
-4. Ensure Apache `mod_rewrite` is enabled so [public/.htaccess](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/public/.htaccess) can route requests through `index.php`.
+1. Point your web root to [`public/`](public/).
+2. Create a database and import [`database/schema.sql`](database/schema.sql).
+3. Copy settings from [`.env.example`](.env.example) into your environment.
+4. Make sure Apache `mod_rewrite` is enabled so [`public/.htaccess`](public/.htaccess) can route requests through `index.php`.
+5. Ensure PHP can write uploaded player images into `public/uploads/players/`.
 
-## Importing team data
+## Local roster import
 
-Generate a CSV locally from the ESPN roster API and then upload it via the admin:
+The importer pulls data from the ESPN NFL roster API and writes a CSV that can be uploaded in the admin backend.
+
+Default Seahawks import:
 
 ```bash
 python3 scripts/import_roster.py
 ```
 
-For a local-image workflow you can also generate a matching ZIP:
+Using a team slug:
+
+```bash
+python3 scripts/import_roster.py --team-slug seahawks
+```
+
+Generating local image assets as well:
 
 ```bash
 python3 scripts/import_roster.py --team-slug seahawks --local-images
 ```
+
+With `--local-images`, the script:
+
+- downloads player headshots
+- writes local image filenames into the CSV
+- creates a matching ZIP archive with all downloaded images
+
+Generated files are written into [`database/imports/`](database/imports/) by default.
+
+More details are documented in [`docs/import.md`](docs/import.md).
+
+## Admin import workflow
+
+The admin player import supports two modes:
+
+1. CSV only
+   Use this when the CSV contains image URLs or no image values.
+2. CSV + ZIP
+   Use this when the CSV was generated with `--local-images`.
+
+In the CSV + ZIP flow, the backend stores the uploaded player images locally in `public/uploads/players/` and rewrites the imported image paths accordingly.
 
 ## Default admin login
 
 - Username: `admin`
 - Development password: `admin123`
 
-For deployment, set your own `ADMIN_PASSWORD_HASH` and remove the plain fallback password.
+For production, set your own `ADMIN_PASSWORD_HASH` and remove the plain fallback password.
+
+## Notes
+
+- The frontend can handle both absolute image URLs and local uploaded image paths.
+- Simulator grouping is intentionally driven by the aliases in [`config/team.php`](config/team.php), not by the raw imported position alone.
+- The Python importer includes an `--insecure` fallback for local SSL issues on macOS Python setups.
