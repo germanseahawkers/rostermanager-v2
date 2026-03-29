@@ -5,6 +5,7 @@ import argparse
 import csv
 import html
 import re
+import ssl
 import sys
 from dataclasses import dataclass
 from html.parser import HTMLParser
@@ -45,9 +46,21 @@ class TextExtractor(HTMLParser):
         return self.parts
 
 
-def fetch(url: str) -> str:
+def build_ssl_context(insecure: bool) -> ssl.SSLContext:
+    if insecure:
+        return ssl._create_unverified_context()
+
+    try:
+        import certifi  # type: ignore
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
+
+
+def fetch(url: str, insecure: bool = False) -> str:
     request = Request(url, headers={"User-Agent": USER_AGENT})
-    with urlopen(request) as response:
+    with urlopen(request, context=build_ssl_context(insecure)) as response:
         return response.read().decode("utf-8", errors="replace")
 
 
@@ -115,7 +128,7 @@ def extract_profile_urls(html_source: str, base_url: str) -> dict[str, str]:
     return profiles
 
 
-def build_rows(roster_html: str, base_url: str, ordering_step: int = 10) -> list[PlayerRow]:
+def build_rows(roster_html: str, base_url: str, ordering_step: int = 10, insecure: bool = False) -> list[PlayerRow]:
     lines = extract_text_lines(roster_html)
     names = extract_active_names(roster_html)
     profiles = extract_profile_urls(roster_html, base_url)
@@ -161,7 +174,7 @@ def build_rows(roster_html: str, base_url: str, ordering_step: int = 10) -> list
 
         if profile_url:
             try:
-                image_url = extract_player_image(fetch(profile_url), profile_url)
+                image_url = extract_player_image(fetch(profile_url, insecure=insecure), profile_url)
             except Exception:
                 image_url = ""
 
@@ -205,11 +218,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Import an NFL roster page into a CSV for rostermanager-v2.")
     parser.add_argument("--url", default=DEFAULT_URL, help="Roster page URL")
     parser.add_argument("--output", default=DEFAULT_OUTPUT, help="CSV output path")
+    parser.add_argument("--insecure", action="store_true", help="Disable SSL certificate verification for local troubleshooting")
     args = parser.parse_args()
 
     try:
-        roster_html = fetch(args.url)
-        rows = build_rows(roster_html, args.url)
+        roster_html = fetch(args.url, insecure=args.insecure)
+        rows = build_rows(roster_html, args.url, insecure=args.insecure)
         if not rows:
             raise RuntimeError("No roster rows could be extracted.")
         write_csv(rows, Path(args.output))

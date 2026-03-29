@@ -18,6 +18,14 @@ python3 scripts/import_roster.py \
   --output "database/imports/seahawks_active_roster.csv"
 ```
 
+If your local Python installation has SSL certificate issues on macOS, you can use:
+
+```bash
+python3 scripts/import_roster.py --insecure
+```
+
+That is only meant as a local fallback. The preferred long-term fix is to install/update your local Python CA certificates.
+
 ## Output format
 
 The script writes a CSV with these headers:
