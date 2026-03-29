@@ -84,11 +84,11 @@ ob_start();
                 <label>Experience
                     <input type="text" name="experience" value="<?= htmlspecialchars((string) $player['experience'], ENT_QUOTES, 'UTF-8') ?>">
                 </label>
-                <label>Weight
-                    <input type="text" name="weight" value="<?= htmlspecialchars((string) $player['weight'], ENT_QUOTES, 'UTF-8') ?>">
+                <label>Weight (kg)
+                    <input type="number" min="1" name="weight_kg" value="<?= htmlspecialchars((string) (metric_weight_kg($player) ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </label>
-                <label>Height
-                    <input type="text" name="height" value="<?= htmlspecialchars((string) $player['height'], ENT_QUOTES, 'UTF-8') ?>">
+                <label>Height (cm)
+                    <input type="number" min="1" name="height_cm" value="<?= htmlspecialchars((string) (metric_height_cm($player) ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                 </label>
                 <label>Image URL / Path
                     <input type="text" name="image" value="<?= htmlspecialchars((string) $player['image'], ENT_QUOTES, 'UTF-8') ?>">
@@ -123,7 +123,7 @@ ob_start();
         <form class="form-panel stack" method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players/import">
             <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
             <h2>CSV import</h2>
-            <p class="hint">Expected header: <code>name,position,abbr,experience,weight,height,image,ordering</code></p>
+            <p class="hint">Expected header: <code>name,position,abbr,experience,weight_kg,height_cm,image,ordering</code></p>
             <label>
                 CSV file
                 <input type="file" name="csv" accept=".csv,text/csv" required>

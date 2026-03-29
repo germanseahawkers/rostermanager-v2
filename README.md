@@ -43,6 +43,7 @@ Team-specific values are centralized in [config/team.php](/Users/simonkell/kDriv
 - [config](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/config)
 - [database](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/database)
 - [docs/architecture.md](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/docs/architecture.md)
+- [docs/import.md](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/docs/import.md)
 
 ## Setup
 
@@ -50,6 +51,14 @@ Team-specific values are centralized in [config/team.php](/Users/simonkell/kDriv
 2. Create a MySQL database and import [database/schema.sql](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/database/schema.sql).
 3. Configure environment variables based on [.env.example](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/.env.example).
 4. Ensure Apache `mod_rewrite` is enabled so [public/.htaccess](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/public/.htaccess) can route requests through `index.php`.
+
+## Importing team data
+
+Generate a CSV locally and then upload it via the admin:
+
+```bash
+python3 scripts/import_roster.py
+```
 
 ## Default admin login
 

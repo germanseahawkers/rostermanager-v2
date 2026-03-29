@@ -197,6 +197,8 @@ function build_simulator_payload(array $players, array $groups, string $locale, 
 
         $player['group_key'] = $groupKey;
         $player['group_label'] = $playersByGroup[$groupKey]['label'];
+        $player['height_cm'] = metric_height_cm($player);
+        $player['weight_kg'] = metric_weight_kg($player);
         $playersByGroup[$groupKey]['players'][] = $player;
 
         if (isset($selectedLookup[(int) $player['id']])) {
@@ -323,8 +325,8 @@ function normalizePlayerPayload(Request $request): array
         'position' => $request->input('position', ''),
         'abbr' => $request->input('abbr', ''),
         'experience' => $request->input('experience', ''),
-        'weight' => $request->input('weight', ''),
-        'height' => $request->input('height', ''),
+        'weight_kg' => $request->input('weight_kg', $request->input('weight', '')),
+        'height_cm' => $request->input('height_cm', $request->input('height', '')),
         'image' => $request->input('image', ''),
         'ordering' => $request->input('ordering', '0'),
     ]);
@@ -409,16 +411,100 @@ function public_asset_url(string $path, array $config): string
 
 function normalizePlayerArray(array $input): array
 {
+    $hasMetricHeight = array_key_exists('height_cm', $input) && (string) $input['height_cm'] !== '';
+    $hasMetricWeight = array_key_exists('weight_kg', $input) && (string) $input['weight_kg'] !== '';
+    $heightCm = parse_height_to_cm(
+        (string) ($input['height_cm'] ?? $input['height'] ?? ''),
+        $hasMetricHeight ? 'metric' : 'legacy'
+    );
+    $weightKg = parse_weight_to_kg(
+        (string) ($input['weight_kg'] ?? $input['weight'] ?? ''),
+        $hasMetricWeight ? 'metric' : 'legacy'
+    );
+
     return [
         'name' => trim((string) ($input['name'] ?? '')),
         'position' => strtoupper(trim((string) ($input['position'] ?? ''))),
         'abbr' => strtoupper(trim((string) ($input['abbr'] ?? ''))),
         'experience' => trim((string) ($input['experience'] ?? '')),
-        'weight' => trim((string) ($input['weight'] ?? '')),
-        'height' => trim((string) ($input['height'] ?? '')),
+        'weight' => $weightKg === null ? '' : (string) $weightKg,
+        'height' => $heightCm === null ? '' : (string) $heightCm,
         'image' => trim((string) ($input['image'] ?? '')),
         'ordering' => (int) ($input['ordering'] ?? 0),
     ];
+}
+
+function metric_height_cm(array $player): ?int
+{
+    $value = (string) ($player['height'] ?? '');
+    return parse_height_to_cm($value, 'metric') ?? parse_height_to_cm($value, 'legacy');
+}
+
+function metric_weight_kg(array $player): ?int
+{
+    return parse_weight_to_kg((string) ($player['weight'] ?? ''), 'metric');
+}
+
+function parse_height_to_cm(string $value, string $mode = 'metric'): ?int
+{
+    $value = trim($value);
+
+    if ($value === '') {
+        return null;
+    }
+
+    if (ctype_digit($value)) {
+        return (int) $value;
+    }
+
+    if (preg_match('/^(\d+)\s*ft\s*(\d+)\s*in$/i', $value, $matches) === 1) {
+        $feet = (int) $matches[1];
+        $inches = (int) $matches[2];
+        return (int) round(($feet * 30.48) + ($inches * 2.54));
+    }
+
+    if (preg_match('/^(\d+(?:[.,]\d+)?)\s*m$/i', $value, $matches) === 1) {
+        return (int) round((float) str_replace(',', '.', $matches[1]) * 100);
+    }
+
+    if (preg_match('/^(\d+(?:[.,]\d+)?)\s*cm$/i', $value, $matches) === 1) {
+        return (int) round((float) str_replace(',', '.', $matches[1]));
+    }
+
+    if ($mode === 'legacy' && preg_match('/^(\d+)-(\d+)$/', $value, $matches) === 1) {
+        $feet = (int) $matches[1];
+        $inches = (int) $matches[2];
+        return (int) round(($feet * 30.48) + ($inches * 2.54));
+    }
+
+    return null;
+}
+
+function parse_weight_to_kg(string $value, string $mode = 'metric'): ?int
+{
+    $value = trim($value);
+
+    if ($value === '') {
+        return null;
+    }
+
+    if (ctype_digit($value)) {
+        $numeric = (int) $value;
+        if ($mode === 'legacy') {
+            return (int) round($numeric * 0.45359237);
+        }
+        return $numeric;
+    }
+
+    if (preg_match('/^(\d+(?:[.,]\d+)?)\s*kg$/i', $value, $matches) === 1) {
+        return (int) round((float) str_replace(',', '.', $matches[1]));
+    }
+
+    if (preg_match('/^(\d+(?:[.,]\d+)?)\s*(?:lb|lbs)$/i', $value, $matches) === 1) {
+        return (int) round((float) str_replace(',', '.', $matches[1]) * 0.45359237);
+    }
+
+    return null;
 }
 
 function emptyPlayer(): array

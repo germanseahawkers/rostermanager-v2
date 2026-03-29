@@ -36,6 +36,8 @@
   const copyLinkButton = root.querySelector("[data-copy-link]");
   const copyFeedback = root.querySelector("[data-copy-feedback]");
   const tabButtons = root.querySelectorAll("[data-group-tab]");
+  const userLocale = (navigator.language || state.locale || "en").toLowerCase();
+  const usesImperial = userLocale.includes("-us") || userLocale === "en-us";
 
   function selectedIdsArray() {
     return Array.from(selectedIds).sort((a, b) => a - b);
@@ -72,6 +74,16 @@
   }
 
   function renderPlayer(player, selected, buttonLabel) {
+    const measurementMeta = [];
+
+    if (player.height_cm) {
+      measurementMeta.push(formatHeight(Number(player.height_cm)));
+    }
+
+    if (player.weight_kg) {
+      measurementMeta.push(formatWeight(Number(player.weight_kg)));
+    }
+
     const avatar = player.image
       ? `<img class="player-photo" src="${encodeURI(`${state.basePath}/${String(player.image).replace(/^\/+/, "")}`)}" alt="${player.name.replace(/"/g, "&quot;")}">`
       : (player.abbr || player.position || "?").slice(0, 3);
@@ -83,12 +95,29 @@
       <div>
         <div class="player-name">${player.name}</div>
         <div class="player-meta">${player.group_label || player.position}${player.experience ? ` · ${player.experience}` : ""}</div>
-        <div class="hint">${[player.height, player.weight].filter(Boolean).join(" · ")}</div>
+        <div class="hint">${measurementMeta.join(" · ")}</div>
       </div>
       <div class="player-toggle">${buttonLabel}</div>
     `;
     element.addEventListener("click", () => togglePlayer(Number(player.id)));
     return element;
+  }
+
+  function formatHeight(heightCm) {
+    if (!Number.isFinite(heightCm) || heightCm <= 0) return "";
+    if (!usesImperial) return `${heightCm} cm`;
+
+    const totalInches = Math.round(heightCm / 2.54);
+    const feet = Math.floor(totalInches / 12);
+    const inches = totalInches % 12;
+    return `${feet}'${inches}"`;
+  }
+
+  function formatWeight(weightKg) {
+    if (!Number.isFinite(weightKg) || weightKg <= 0) return "";
+    if (!usesImperial) return `${weightKg} kg`;
+
+    return `${Math.round(weightKg * 2.20462262)} lbs`;
   }
 
   function updateCounts() {

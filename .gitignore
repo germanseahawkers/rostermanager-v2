@@ -3,3 +3,5 @@
 !/storage/uploads/.gitkeep
 /public/uploads/players/*
 !/public/uploads/players/.gitkeep
+/database/imports/*.csv
+!/database/imports/.gitkeep
