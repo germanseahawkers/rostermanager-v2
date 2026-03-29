@@ -93,13 +93,10 @@ ob_start();
             </div>
         </div>
 
-    </div>
-
-    <aside class="sim-sidebar">
-        <div class="card-panel sticky-panel">
-            <div class="sidebar-title">
+        <div class="card-panel review-panel">
+            <div class="panel-head">
                 <div>
-                    <div class="panel-kicker"><?= htmlspecialchars($t['selected_roster'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="panel-kicker"><?= htmlspecialchars($t['review_title'], ENT_QUOTES, 'UTF-8') ?></div>
                     <h2 data-summary-total><?= (int) $simulator['selected_count'] ?>/<?= (int) $simulator['roster_limit'] ?></h2>
                 </div>
                 <div class="status-chip" data-roster-status><?= htmlspecialchars($simulator['complete'] ? $t['status_complete'] : $t['status_incomplete'], ENT_QUOTES, 'UTF-8') ?></div>
@@ -118,17 +115,19 @@ ob_start();
                 </div>
             </div>
 
-            <?php foreach ($simulator['sections'] as $section): ?>
-                <div class="summary-block">
-                    <h3><?= htmlspecialchars($section['label'], ENT_QUOTES, 'UTF-8') ?></h3>
-                    <?php foreach ($section['groups'] as $group): ?>
-                        <div class="summary-line">
-                            <span><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <strong data-sidebar-count="<?= htmlspecialchars($group['key'], ENT_QUOTES, 'UTF-8') ?>"><?= (int) $group['count_selected'] ?></strong>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endforeach; ?>
+            <div class="review-grid">
+                <?php foreach ($simulator['sections'] as $section): ?>
+                    <article class="review-card">
+                        <h3><?= htmlspecialchars($section['label'], ENT_QUOTES, 'UTF-8') ?></h3>
+                        <?php foreach ($section['groups'] as $group): ?>
+                            <div class="summary-line">
+                                <span><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                                <strong data-sidebar-count="<?= htmlspecialchars($group['key'], ENT_QUOTES, 'UTF-8') ?>"><?= (int) $group['count_selected'] ?></strong>
+                            </div>
+                        <?php endforeach; ?>
+                    </article>
+                <?php endforeach; ?>
+            </div>
 
             <div class="share-box">
                 <h3><?= htmlspecialchars($t['share_title'], ENT_QUOTES, 'UTF-8') ?></h3>
@@ -144,7 +143,7 @@ ob_start();
                 <p class="hint" data-copy-feedback><?= htmlspecialchars($t['review_hint'], ENT_QUOTES, 'UTF-8') ?></p>
             </div>
         </div>
-    </aside>
+    </div>
 </section>
 
 <script src="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/assets/simulator.js" defer></script>

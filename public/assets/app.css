@@ -90,7 +90,7 @@ a { color: inherit; }
 }
 
 .card-panel, .form-panel { padding: 1.25rem; }
-.sim-layout { display: grid; grid-template-columns: minmax(0, 1.8fr) 360px; gap: 1.25rem; align-items: start; }
+.sim-layout { display: grid; gap: 1.25rem; }
 .sim-main { display: grid; gap: 1.25rem; }
 .sim-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.7rem; }
 
