@@ -15,7 +15,7 @@ function supported_locales(): array
     ];
 }
 
-function resolve_locale(mixed $value, string $default = 'de'): string
+function resolve_locale(mixed $value, string $default = 'en'): string
 {
     $locale = is_string($value) ? strtolower(trim($value)) : '';
     $supported = supported_locales();

@@ -20,7 +20,7 @@ final class PublicRosterController
 
     public function index(Request $request): Response
     {
-        $locale = resolve_locale($request->query('lang', 'de'));
+        $locale = resolve_locale($request->query('lang', 'en'));
         $translations = translations($locale);
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
@@ -44,7 +44,7 @@ final class PublicRosterController
 
     public function share(Request $request): Response
     {
-        $locale = resolve_locale($request->query('lang', 'de'));
+        $locale = resolve_locale($request->query('lang', 'en'));
         $translations = translations($locale);
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
@@ -69,7 +69,7 @@ final class PublicRosterController
 
     public function shareCard(Request $request): Response
     {
-        $locale = resolve_locale($request->query('lang', 'de'));
+        $locale = resolve_locale($request->query('lang', 'en'));
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
         $simulator = build_simulator_payload(

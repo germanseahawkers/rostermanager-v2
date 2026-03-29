@@ -5,7 +5,7 @@
 $theme = $theme ?? ($config['team']['colors'] ?? []);
 ?>
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars($lang ?? 'de', ENT_QUOTES, 'UTF-8') ?>">
+<html lang="<?= htmlspecialchars($lang ?? 'en', ENT_QUOTES, 'UTF-8') ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,7 +26,7 @@ $theme = $theme ?? ($config['team']['colors'] ?? []);
     <link rel="stylesheet" href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/assets/app.css">
 </head>
 <body>
-<?php $ui = translations($lang ?? 'de'); ?>
+<?php $ui = translations($lang ?? 'en'); ?>
 <header class="site-header">
     <div class="container site-header-inner">
         <a class="brand" href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/"><?= htmlspecialchars($config['app']['name'], ENT_QUOTES, 'UTF-8') ?></a>
