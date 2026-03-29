@@ -62,6 +62,8 @@ That makes the project reusable for other teams without changing the core simula
 4. Make sure Apache `mod_rewrite` is enabled so [`public/.htaccess`](public/.htaccess) can route requests through `index.php`.
 5. Ensure PHP can write uploaded player images into `public/uploads/players/`.
 
+If you already have an existing installation based on the older schema, run [`database/migrate_players_to_metric_columns.sql`](database/migrate_players_to_metric_columns.sql) once before deploying this version.
+
 ## Local roster import
 
 The importer pulls data from the ESPN NFL roster API and writes a CSV that can be uploaded in the admin backend.
@@ -111,6 +113,8 @@ If the CSV includes an `id` column for every row, the import switches to sync mo
 - new IDs are created
 - players missing from the uploaded ID set are deleted
 - existing player ordering is preserved during updates
+
+The current player model keeps a single `position` field plus metric storage in `weight_kg` and `height_cm`.
 
 ## Default admin login
 

@@ -62,7 +62,6 @@ class PlayerRow:
     name: str
     player_id: str
     position: str
-    abbr: str
     experience: str
     weight_kg: int | None
     height_cm: int | None
@@ -212,7 +211,6 @@ def build_rows(payload: dict, ordering_step: int = 10) -> list[PlayerRow]:
                     name=full_name,
                     player_id=str(item.get("id") or ""),
                     position=position,
-                    abbr=position,
                     experience=experience_years,
                     weight_kg=parse_weight_to_kg(item.get("weight")),
                     height_cm=parse_height_to_cm(item.get("height")),
@@ -295,14 +293,13 @@ def write_csv(rows: Iterable[PlayerRow], output_path: Path) -> None:
 
     with output_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["id", "name", "position", "abbr", "experience", "weight_kg", "height_cm", "image", "ordering"])
+        writer.writerow(["id", "name", "position", "experience", "weight_kg", "height_cm", "image", "ordering"])
 
         for row in rows:
             writer.writerow([
                 row.player_id,
                 row.name,
                 row.position,
-                row.abbr,
                 row.experience,
                 row.weight_kg or "",
                 row.height_cm or "",

@@ -34,7 +34,6 @@ ob_start();
                 <tr>
                     <th>Name</th>
                     <th>Position</th>
-                    <th>Abbr</th>
                     <th>Experience</th>
                     <th>Ordering</th>
                     <th>Actions</th>
@@ -45,7 +44,6 @@ ob_start();
                     <tr>
                         <td><?= htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars($item['position'], ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><?= htmlspecialchars($item['abbr'], ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= htmlspecialchars($item['experience'], ENT_QUOTES, 'UTF-8') ?></td>
                         <td><?= (int) $item['ordering'] ?></td>
                         <td>
@@ -77,9 +75,6 @@ ob_start();
                 </label>
                 <label>Position
                     <input type="text" name="position" value="<?= htmlspecialchars((string) $player['position'], ENT_QUOTES, 'UTF-8') ?>" required>
-                </label>
-                <label>Abbr
-                    <input type="text" name="abbr" value="<?= htmlspecialchars((string) $player['abbr'], ENT_QUOTES, 'UTF-8') ?>">
                 </label>
                 <label>Experience
                     <input type="text" name="experience" value="<?= htmlspecialchars((string) $player['experience'], ENT_QUOTES, 'UTF-8') ?>">
@@ -125,7 +120,7 @@ ob_start();
         <form class="form-panel stack" method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players/import">
             <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
             <h2>CSV import</h2>
-            <p class="hint">Expected header: <code>id,name,position,abbr,experience,weight_kg,height_cm,image,ordering</code>. The <code>id</code> column is optional.</p>
+            <p class="hint">Expected header: <code>id,name,position,experience,weight_kg,height_cm,image,ordering</code>. The <code>id</code> column is optional.</p>
             <p class="hint">Without IDs, every row is imported as a new player. With IDs in every row, the import becomes a sync: existing IDs are updated, missing IDs are deleted, and ordering is preserved for updated players.</p>
             <label>
                 CSV file

@@ -324,7 +324,6 @@ function normalizePlayerPayload(Request $request): array
         'id' => $request->input('id', ''),
         'name' => $request->input('name', ''),
         'position' => $request->input('position', ''),
-        'abbr' => $request->input('abbr', ''),
         'experience' => $request->input('experience', ''),
         'weight_kg' => $request->input('weight_kg', $request->input('weight', '')),
         'height_cm' => $request->input('height_cm', $request->input('height', '')),
@@ -631,11 +630,10 @@ function normalizePlayerArray(array $input): array
 
     $normalized = [
         'name' => trim((string) ($input['name'] ?? '')),
-        'position' => strtoupper(trim((string) ($input['position'] ?? ''))),
-        'abbr' => strtoupper(trim((string) ($input['abbr'] ?? ''))),
+        'position' => strtoupper(trim((string) (($input['position'] ?? '') !== '' ? $input['position'] : ($input['abbr'] ?? '')))),
         'experience' => trim((string) ($input['experience'] ?? '')),
-        'weight' => $weightKg === null ? '' : (string) $weightKg,
-        'height' => $heightCm === null ? '' : (string) $heightCm,
+        'weight_kg' => $weightKg === null ? '' : (string) $weightKg,
+        'height_cm' => $heightCm === null ? '' : (string) $heightCm,
         'image' => trim((string) ($input['image'] ?? '')),
         'ordering' => (int) ($input['ordering'] ?? 0),
     ];
@@ -670,13 +668,13 @@ function import_rows_use_ids(array $rows): bool
 
 function metric_height_cm(array $player): ?int
 {
-    $value = (string) ($player['height'] ?? '');
+    $value = (string) ($player['height_cm'] ?? $player['height'] ?? '');
     return parse_height_to_cm($value, 'metric') ?? parse_height_to_cm($value, 'legacy');
 }
 
 function metric_weight_kg(array $player): ?int
 {
-    return parse_weight_to_kg((string) ($player['weight'] ?? ''), 'metric');
+    return parse_weight_to_kg((string) ($player['weight_kg'] ?? $player['weight'] ?? ''), 'metric');
 }
 
 function parse_height_to_cm(string $value, string $mode = 'metric'): ?int
@@ -747,10 +745,9 @@ function emptyPlayer(): array
         'id' => null,
         'name' => '',
         'position' => '',
-        'abbr' => '',
         'experience' => '',
-        'weight' => '',
-        'height' => '',
+        'weight_kg' => '',
+        'height_cm' => '',
         'image' => '',
         'ordering' => 0,
     ];

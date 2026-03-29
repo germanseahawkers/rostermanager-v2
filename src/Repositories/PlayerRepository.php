@@ -78,18 +78,17 @@ final class PlayerRepository
     {
         if (isset($data['id']) && $data['id'] !== null) {
             $statement = $this->pdo->prepare(
-                'INSERT INTO players (id, name, position, abbr, experience, weight, height, image, ordering)
-                 VALUES (:id, :name, :position, :abbr, :experience, :weight, :height, :image, :ordering)'
+                'INSERT INTO players (id, name, position, experience, weight_kg, height_cm, image, ordering)
+                 VALUES (:id, :name, :position, :experience, :weight_kg, :height_cm, :image, :ordering)'
             );
 
             $statement->execute([
                 'id' => (int) $data['id'],
                 'name' => $data['name'],
                 'position' => $data['position'],
-                'abbr' => $data['abbr'],
                 'experience' => $data['experience'],
-                'weight' => $data['weight'],
-                'height' => $data['height'],
+                'weight_kg' => $data['weight_kg'],
+                'height_cm' => $data['height_cm'],
                 'image' => $data['image'],
                 'ordering' => $data['ordering'],
             ]);
@@ -97,17 +96,16 @@ final class PlayerRepository
         }
 
         $statement = $this->pdo->prepare(
-            'INSERT INTO players (name, position, abbr, experience, weight, height, image, ordering)
-             VALUES (:name, :position, :abbr, :experience, :weight, :height, :image, :ordering)'
+            'INSERT INTO players (name, position, experience, weight_kg, height_cm, image, ordering)
+             VALUES (:name, :position, :experience, :weight_kg, :height_cm, :image, :ordering)'
         );
 
         $statement->execute([
             'name' => $data['name'],
             'position' => $data['position'],
-            'abbr' => $data['abbr'],
             'experience' => $data['experience'],
-            'weight' => $data['weight'],
-            'height' => $data['height'],
+            'weight_kg' => $data['weight_kg'],
+            'height_cm' => $data['height_cm'],
             'image' => $data['image'],
             'ordering' => $data['ordering'],
         ]);
@@ -117,8 +115,8 @@ final class PlayerRepository
     {
         $statement = $this->pdo->prepare(
             'UPDATE players
-             SET name = :name, position = :position, abbr = :abbr, experience = :experience,
-                 weight = :weight, height = :height, image = :image, ordering = :ordering
+             SET name = :name, position = :position, experience = :experience,
+                 weight_kg = :weight_kg, height_cm = :height_cm, image = :image, ordering = :ordering
              WHERE id = :id'
         );
 
@@ -126,10 +124,9 @@ final class PlayerRepository
             'id' => $id,
             'name' => $data['name'],
             'position' => $data['position'],
-            'abbr' => $data['abbr'],
             'experience' => $data['experience'],
-            'weight' => $data['weight'],
-            'height' => $data['height'],
+            'weight_kg' => $data['weight_kg'],
+            'height_cm' => $data['height_cm'],
             'image' => $data['image'],
             'ordering' => $data['ordering'],
         ]);
@@ -139,8 +136,8 @@ final class PlayerRepository
     {
         $statement = $this->pdo->prepare(
             'UPDATE players
-             SET name = :name, position = :position, abbr = :abbr, experience = :experience,
-                 weight = :weight, height = :height, image = :image
+             SET name = :name, position = :position, experience = :experience,
+                 weight_kg = :weight_kg, height_cm = :height_cm, image = :image
              WHERE id = :id'
         );
 
@@ -148,10 +145,9 @@ final class PlayerRepository
             'id' => $id,
             'name' => $data['name'],
             'position' => $data['position'],
-            'abbr' => $data['abbr'],
             'experience' => $data['experience'],
-            'weight' => $data['weight'],
-            'height' => $data['height'],
+            'weight_kg' => $data['weight_kg'],
+            'height_cm' => $data['height_cm'],
             'image' => $data['image'],
         ]);
     }

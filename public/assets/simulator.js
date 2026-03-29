@@ -92,7 +92,7 @@
 
     const avatar = player.image
       ? `<img class="player-photo" src="${encodeURI(imageSrc(player.image))}" alt="${player.name.replace(/"/g, "&quot;")}">`
-      : (player.abbr || player.position || "?").slice(0, 3);
+      : (player.position || "?").slice(0, 3);
     const element = document.createElement("button");
     element.type = "button";
     element.className = `player-card${selected ? " selected" : ""}`;

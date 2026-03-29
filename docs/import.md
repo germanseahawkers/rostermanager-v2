@@ -4,6 +4,8 @@ The project includes a local importer that pulls roster data from the ESPN NFL t
 
 It can also optionally download player headshots into a ZIP archive so the images can be uploaded once and served locally by this project.
 
+If your installation still uses the older `abbr`, `weight` and `height` columns, run [`database/migrate_players_to_metric_columns.sql`](../database/migrate_players_to_metric_columns.sql) once before using the current import flow.
+
 ## Usage
 
 Run the default Seahawks import:
@@ -60,7 +62,7 @@ That is only meant as a local fallback. The preferred long-term fix is to instal
 The script writes a CSV with these headers:
 
 ```text
-id,name,position,abbr,experience,weight_kg,height_cm,image,ordering
+id,name,position,experience,weight_kg,height_cm,image,ordering
 ```
 
 Notes:
