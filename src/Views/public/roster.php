@@ -17,6 +17,9 @@ $simulatorConfig = [
         'incomplete' => $t['status_incomplete'],
         'copyDone' => $t['copy_done'],
         'shareCaption' => $t['share_caption'],
+        'experienceRookie' => $t['experience_rookie'],
+        'experienceYearSingular' => $t['experience_year_singular'],
+        'experienceYearPlural' => $t['experience_year_plural'],
     ],
 ];
 

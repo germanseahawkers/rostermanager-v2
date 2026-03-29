@@ -81,6 +81,7 @@
 
   function renderPlayer(player, selected, buttonLabel) {
     const measurementMeta = [];
+    const experience = formatExperience(player.experience);
 
     if (player.height_cm) {
       measurementMeta.push(formatHeight(Number(player.height_cm)));
@@ -100,7 +101,7 @@
       <div class="player-avatar">${avatar}</div>
       <div>
         <div class="player-name">${player.name}</div>
-        <div class="player-meta">${player.group_label || player.position}${player.experience ? ` · ${player.experience}` : ""}</div>
+        <div class="player-meta">${player.group_label || player.position}${experience ? ` · ${experience}` : ""}</div>
         <div class="hint">${measurementMeta.join(" · ")}</div>
       </div>
       <div class="player-toggle">${buttonLabel}</div>
@@ -124,6 +125,17 @@
     if (!usesImperial) return `${weightKg} kg`;
 
     return `${Math.round(weightKg * 2.20462262)} lbs`;
+  }
+
+  function formatExperience(value) {
+    const normalized = String(value ?? "").trim();
+    if (!normalized) return "";
+    if (!/^\d+$/.test(normalized)) return normalized;
+
+    const years = Number(normalized);
+    if (years === 0) return state.labels.experienceRookie || "Rookie";
+    if (years === 1) return `1 ${state.labels.experienceYearSingular || "year"}`;
+    return `${years} ${state.labels.experienceYearPlural || "years"}`;
   }
 
   function updateCounts() {
