@@ -1,6 +1,8 @@
 # Importing roster data
 
-The project includes a small local importer that pulls roster data from the ESPN NFL team roster API and turns it into a CSV for the admin UI. It can also optionally download all player headshots into a ZIP for local server uploads.
+The project includes a local importer that pulls roster data from the ESPN NFL team roster API and writes a CSV for the admin backend.
+
+It can also optionally download player headshots into a ZIP archive so the images can be uploaded once and served locally by this project.
 
 ## Usage
 
@@ -17,6 +19,8 @@ python3 scripts/import_roster.py \
   --team-slug seahawks \
   --output "database/imports/seahawks_active_roster.csv"
 ```
+
+The slug can be either a short form such as `seahawks` or a full ESPN-style slug such as `seattle-seahawks`.
 
 Use a custom endpoint template if needed:
 
@@ -62,16 +66,34 @@ name,position,abbr,experience,weight_kg,height_cm,image,ordering
 Notes:
 
 - The real ESPN position abbreviation is preserved in `position`
-- Simulator grouping still happens through the mapping in `config/team.php`
+- Simulator grouping still happens through the aliases in [`config/team.php`](../config/team.php)
 - Height is normalized to centimeters
 - Weight is normalized to kilograms
 - By default, `image` uses the ESPN `headshot.href` value when available
 - With `--local-images`, `image` contains the local filename that is also written into the ZIP archive
 
+## Admin import modes
+
+The admin backend supports two import modes:
+
+1. CSV only
+   Use this when the `image` column contains absolute URLs or is empty.
+2. CSV plus ZIP
+   Use this when the CSV was generated with `--local-images`.
+
+In CSV plus ZIP mode:
+
+- the ZIP is uploaded together with the CSV
+- the backend stores the images in `public/uploads/players/`
+- the imported player rows are rewritten to local image paths
+
+If a CSV image reference cannot be matched to a file in the ZIP archive, the import fails with a clear error instead of partially importing the roster.
+
 ## Typical workflow
 
 1. Run the script locally
 2. If you used `--local-images`, keep the generated ZIP next to the CSV
-3. Check the generated files in `database/imports/`
-4. Upload the CSV in the admin backend
-5. Optionally upload the images ZIP together with the CSV so the server stores the player pictures locally
+3. Check the generated files in [`database/imports/`](../database/imports/)
+4. Open the admin player import
+5. Upload the CSV
+6. If applicable, upload the matching images ZIP as well
