@@ -54,7 +54,7 @@ Team-specific values are centralized in [config/team.php](/Users/simonkell/kDriv
 
 ## Importing team data
 
-Generate a CSV locally and then upload it via the admin:
+Generate a CSV locally from the ESPN roster API and then upload it via the admin:
 
 ```bash
 python3 scripts/import_roster.py

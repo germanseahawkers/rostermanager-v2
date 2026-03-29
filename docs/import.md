@@ -1,6 +1,6 @@
 # Importing roster data
 
-The project includes a small local scraper that turns an NFL team roster page into a CSV that can be uploaded through the admin UI.
+The project includes a small local importer that pulls roster data from the ESPN NFL team roster API and turns it into a CSV for the admin UI.
 
 ## Usage
 
@@ -10,12 +10,20 @@ Run the default Seahawks import:
 python3 scripts/import_roster.py
 ```
 
-Choose a different source URL or output file:
+Choose a different team or output file:
 
 ```bash
 python3 scripts/import_roster.py \
-  --url "https://www.seahawks.com/team/players-roster/" \
+  --team-id 26 \
   --output "database/imports/seahawks_active_roster.csv"
+```
+
+Use a custom endpoint template if needed:
+
+```bash
+python3 scripts/import_roster.py \
+  --team-id 26 \
+  --endpoint "https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/{team_id}/roster"
 ```
 
 If your local Python installation has SSL certificate issues on macOS, you can use:
@@ -24,7 +32,7 @@ If your local Python installation has SSL certificate issues on macOS, you can u
 python3 scripts/import_roster.py --insecure
 ```
 
-That is only meant as a local fallback. The preferred long-term fix is to install/update your local Python CA certificates.
+That is only meant as a local fallback. The preferred long-term fix is to install or update your local Python CA certificates.
 
 ## Output format
 
@@ -36,11 +44,11 @@ name,position,abbr,experience,weight_kg,height_cm,image,ordering
 
 Notes:
 
-- The real position is preserved in `position`
+- The real ESPN position abbreviation is preserved in `position`
 - Simulator grouping still happens through the mapping in `config/team.php`
 - Height is normalized to centimeters
 - Weight is normalized to kilograms
-- `image` tries to pull the official player image URL from the player profile page
+- `image` uses the ESPN `headshot.href` value when available
 
 ## Typical workflow
 
