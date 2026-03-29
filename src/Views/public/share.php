@@ -1,6 +1,11 @@
 <?php
 
 $team = $config['team'];
+$club = $config['club'] ?? [];
+$clubName = trim((string) ($club['name'] ?? ''));
+$clubTagline = trim((string) ($club['tagline'] ?? ''));
+$clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
+$clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
 
 ob_start();
 ?>
@@ -9,6 +14,19 @@ ob_start();
         <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['city']), ENT_QUOTES, 'UTF-8') ?></div>
         <h1><?= htmlspecialchars($team['name'] . ' ' . $t['share_page_title'], ENT_QUOTES, 'UTF-8') ?></h1>
         <p class="lead"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
+        <?php if ($clubName !== ''): ?>
+            <div class="club-note">
+                <?php if ($clubLogoUrl !== ''): ?>
+                    <img class="club-note-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>">
+                <?php endif; ?>
+                <div>
+                    <strong><?= htmlspecialchars(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?></strong>
+                    <?php if ($clubTagline !== ''): ?>
+                        <div class="club-note-copy"><?= htmlspecialchars($clubTagline, ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
     <div class="card-panel">
         <div class="metric-grid">

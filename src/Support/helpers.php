@@ -101,6 +101,8 @@ function translations(string $locale): array
             'experience_rookie' => 'Rookie',
             'experience_year_singular' => 'Jahr',
             'experience_year_plural' => 'Jahre',
+            'club_presented_by' => 'Ein Angebot des',
+            'club_developed_by' => 'Entwickelt für den',
             'group_offense' => 'Offense',
             'group_defense' => 'Defense',
             'group_special_teams' => 'Special Teams',
@@ -146,6 +148,8 @@ function translations(string $locale): array
             'experience_rookie' => 'Rookie',
             'experience_year_singular' => 'year',
             'experience_year_plural' => 'years',
+            'club_presented_by' => 'Presented by',
+            'club_developed_by' => 'Built for',
             'group_offense' => 'Offense',
             'group_defense' => 'Defense',
             'group_special_teams' => 'Special Teams',
@@ -191,6 +195,8 @@ function translations(string $locale): array
             'experience_rookie' => 'Rookie',
             'experience_year_singular' => 'año',
             'experience_year_plural' => 'años',
+            'club_presented_by' => 'Presentado por',
+            'club_developed_by' => 'Desarrollado para',
             'group_offense' => 'Ataque',
             'group_defense' => 'Defensa',
             'group_special_teams' => 'Equipos especiales',
@@ -236,6 +242,8 @@ function translations(string $locale): array
             'experience_rookie' => 'Rookie',
             'experience_year_singular' => 'an',
             'experience_year_plural' => 'ans',
+            'club_presented_by' => 'Proposé par',
+            'club_developed_by' => 'Conçu pour',
             'group_offense' => 'Attaque',
             'group_defense' => 'Défense',
             'group_special_teams' => 'Équipes spéciales',
@@ -281,6 +289,8 @@ function translations(string $locale): array
             'experience_rookie' => 'Rookie',
             'experience_year_singular' => 'ano',
             'experience_year_plural' => 'anos',
+            'club_presented_by' => 'Apresentado por',
+            'club_developed_by' => 'Desenvolvido para',
             'group_offense' => 'Ataque',
             'group_defense' => 'Defesa',
             'group_special_teams' => 'Times especiais',
@@ -417,10 +427,13 @@ function build_simulator_payload(array $players, array $groups, string $locale, 
 function render_share_card_svg(array $simulator, array $config, string $locale): string
 {
     $team = $config['team'];
+    $club = $config['club'] ?? [];
     $colors = $team['colors'];
     $t = translations($locale);
     $title = svg_escape($team['name'] . ' 53-Man');
     $subtitle = svg_escape($t['share_card_subtitle'] . ' · ' . count($simulator['selected_ids']) . '/' . $simulator['roster_limit']);
+    $clubName = trim((string) ($club['name'] ?? ''));
+    $clubLine = $clubName !== '' ? trim(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName) : '';
     $rows = [];
     $y = 240;
 
@@ -443,6 +456,9 @@ function render_share_card_svg(array $simulator, array $config, string $locale):
         $y += 18;
     }
 
+    if ($clubLine !== '') {
+        $rows[] = '<text x="80" y="1050" font-size="18" fill="' . $colors['surface_alt'] . '">' . svg_escape($clubLine) . '</text>';
+    }
     $rows[] = '<text x="80" y="1080" font-size="20" fill="' . $colors['surface_alt'] . '">' . svg_escape($team['tagline']) . '</text>';
 
     return '<?xml version="1.0" encoding="UTF-8"?>'

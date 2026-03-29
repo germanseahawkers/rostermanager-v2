@@ -8,6 +8,12 @@ return [
         'base_path' => rtrim(getenv('APP_BASE_PATH') ?: '', '/'),
         'debug' => filter_var(getenv('APP_DEBUG') ?: false, FILTER_VALIDATE_BOOL),
     ],
+    'club' => [
+        'name' => getenv('CLUB_NAME') ?: '',
+        'logo_path' => getenv('CLUB_LOGO_PATH') ?: '',
+        'tagline' => getenv('CLUB_TAGLINE') ?: '',
+        'url' => getenv('CLUB_URL') ?: '',
+    ],
     'db' => [
         'driver' => getenv('DB_DRIVER') ?: 'mysql',
         'host' => getenv('DB_HOST') ?: '127.0.0.1',

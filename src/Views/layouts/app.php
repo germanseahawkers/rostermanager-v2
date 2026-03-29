@@ -3,6 +3,12 @@
 /** @var string $content */
 /** @var string $title */
 $theme = $theme ?? ($config['team']['colors'] ?? []);
+$club = $config['club'] ?? [];
+$clubName = trim((string) ($club['name'] ?? ''));
+$clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
+$clubTagline = trim((string) ($club['tagline'] ?? ''));
+$brandHref = ($config['app']['base_path'] ?? '') . '/';
+$clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($lang ?? 'en', ENT_QUOTES, 'UTF-8') ?>">
@@ -29,7 +35,17 @@ $theme = $theme ?? ($config['team']['colors'] ?? []);
 <?php $ui = translations($lang ?? 'en'); ?>
 <header class="site-header">
     <div class="container site-header-inner">
-        <a class="brand" href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/"><?= htmlspecialchars($config['app']['name'], ENT_QUOTES, 'UTF-8') ?></a>
+        <a class="brand-lockup" href="<?= htmlspecialchars($brandHref, ENT_QUOTES, 'UTF-8') ?>">
+            <?php if ($clubLogoUrl !== ''): ?>
+                <img class="brand-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName !== '' ? $clubName : $config['app']['name'], ENT_QUOTES, 'UTF-8') ?>">
+            <?php endif; ?>
+            <span class="brand-copy">
+                <span class="brand"><?= htmlspecialchars($config['app']['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                <?php if ($clubName !== ''): ?>
+                    <span class="brand-subline"><?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?></span>
+                <?php endif; ?>
+            </span>
+        </a>
         <nav class="nav">
             <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/"><?= htmlspecialchars($ui['nav_roster'], ENT_QUOTES, 'UTF-8') ?></a>
             <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players"><?= htmlspecialchars($ui['nav_admin'], ENT_QUOTES, 'UTF-8') ?></a>
@@ -44,7 +60,16 @@ $theme = $theme ?? ($config['team']['colors'] ?? []);
 <footer class="site-footer">
     <div class="container site-footer-inner">
         <span class="muted"><?= htmlspecialchars($ui['built_with'], ENT_QUOTES, 'UTF-8') ?></span>
-        <span class="muted"><?= htmlspecialchars($ui['made_for'], ENT_QUOTES, 'UTF-8') ?></span>
+        <span class="muted">
+            <?php if ($clubName !== ''): ?>
+                <?= htmlspecialchars(($ui['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?>
+            <?php else: ?>
+                <?= htmlspecialchars($ui['made_for'], ENT_QUOTES, 'UTF-8') ?>
+            <?php endif; ?>
+        </span>
+        <?php if ($clubTagline !== ''): ?>
+            <span class="muted"><?= htmlspecialchars($clubTagline, ENT_QUOTES, 'UTF-8') ?></span>
+        <?php endif; ?>
     </div>
 </footer>
 </body>

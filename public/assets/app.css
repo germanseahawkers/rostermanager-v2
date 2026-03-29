@@ -38,6 +38,23 @@ a { color: inherit; }
 .site-shell { padding-bottom: 2rem; }
 .brand, .sim-hero-copy h1, .card-panel h2, .card-panel h3 { font-family: "Space Grotesk", "Segoe UI", sans-serif; }
 .brand { font-size: 1.15rem; font-weight: 700; text-decoration: none; }
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+}
+.brand-copy { display: grid; gap: 0.15rem; }
+.brand-subline { font-size: 0.82rem; color: var(--muted); }
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.35rem;
+  border: 1px solid rgba(181, 197, 214, 0.8);
+}
 .muted, .hint, .lead { color: var(--muted); }
 .eyebrow, .panel-kicker {
   text-transform: uppercase;
@@ -80,6 +97,28 @@ a { color: inherit; }
   color: rgba(247, 251, 255, 0.78);
   font-size: 1.05rem;
 }
+.club-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.club-note-logo, .club-panel-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.3rem;
+}
+.club-note-copy {
+  color: rgba(247, 251, 255, 0.72);
+  font-size: 0.92rem;
+}
 
 .pill, .status-chip, .panel-count {
   border-radius: 999px;
@@ -90,6 +129,17 @@ a { color: inherit; }
 }
 
 .card-panel, .form-panel { padding: 1.25rem; }
+.club-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+.club-panel-name {
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
 .sim-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
 .sim-main { display: grid; gap: 1.25rem; width: 100%; min-width: 0; }
 .sim-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.7rem; }
