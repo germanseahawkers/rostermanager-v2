@@ -64,7 +64,7 @@ ob_start();
     </div>
 
     <div class="stack">
-        <form class="form-panel stack" method="post" action="<?= htmlspecialchars($config['app']['base_path'] . $formAction, ENT_QUOTES, 'UTF-8') ?>">
+        <form class="form-panel stack" method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($config['app']['base_path'] . $formAction, ENT_QUOTES, 'UTF-8') ?>">
             <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
             <h2><?= $isEditing ? 'Edit player' : 'New player' ?></h2>
             <?php if ($isEditing): ?>
@@ -93,10 +93,24 @@ ob_start();
                 <label>Image URL / Path
                     <input type="text" name="image" value="<?= htmlspecialchars((string) $player['image'], ENT_QUOTES, 'UTF-8') ?>">
                 </label>
+                <label>Player image upload
+                    <input type="file" name="image_upload" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                </label>
                 <label>Ordering
                     <input type="number" name="ordering" value="<?= (int) $player['ordering'] ?>">
                 </label>
             </div>
+
+            <?php if (!empty($player['image'])): ?>
+                <div class="stack">
+                    <span class="hint">Current player image</span>
+                    <img
+                        src="<?= htmlspecialchars(public_asset_url((string) $player['image'], $config), ENT_QUOTES, 'UTF-8') ?>"
+                        alt="<?= htmlspecialchars((string) $player['name'], ENT_QUOTES, 'UTF-8') ?>"
+                        style="width: 112px; height: 112px; object-fit: cover; border-radius: 18px; border: 1px solid rgba(181, 197, 214, 0.8);"
+                    >
+                </div>
+            <?php endif; ?>
 
             <div class="actions">
                 <button type="submit"><?= $isEditing ? 'Save changes' : 'Create player' ?></button>

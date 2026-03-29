@@ -72,11 +72,14 @@
   }
 
   function renderPlayer(player, selected, buttonLabel) {
+    const avatar = player.image
+      ? `<img class="player-photo" src="${encodeURI(`${state.basePath}/${String(player.image).replace(/^\/+/, "")}`)}" alt="${player.name.replace(/"/g, "&quot;")}">`
+      : (player.abbr || player.position || "?").slice(0, 3);
     const element = document.createElement("button");
     element.type = "button";
     element.className = `player-card${selected ? " selected" : ""}`;
     element.innerHTML = `
-      <div class="player-avatar">${(player.abbr || player.position || "?").slice(0, 3)}</div>
+      <div class="player-avatar">${avatar}</div>
       <div>
         <div class="player-name">${player.name}</div>
         <div class="player-meta">${player.group_label || player.position}${player.experience ? ` · ${player.experience}` : ""}</div>

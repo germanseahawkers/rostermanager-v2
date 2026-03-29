@@ -330,6 +330,83 @@ function normalizePlayerPayload(Request $request): array
     ]);
 }
 
+function player_payload_with_uploaded_image(Request $request, ?array $existingPlayer = null): array
+{
+    $payload = normalizePlayerPayload($request);
+    $uploadedImagePath = handle_player_image_upload($request->file('image_upload'));
+
+    if ($uploadedImagePath !== null) {
+        $payload['image'] = $uploadedImagePath;
+        return $payload;
+    }
+
+    if (($payload['image'] ?? '') !== '') {
+        return $payload;
+    }
+
+    $payload['image'] = (string) ($existingPlayer['image'] ?? '');
+
+    return $payload;
+}
+
+function handle_player_image_upload(?array $file): ?string
+{
+    if ($file === null) {
+        return null;
+    }
+
+    $errorCode = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+
+    if ($errorCode === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    if ($errorCode !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('The player image upload failed.');
+    }
+
+    $tmpName = (string) ($file['tmp_name'] ?? '');
+
+    if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+        throw new RuntimeException('The uploaded player image is invalid.');
+    }
+
+    $mimeType = mime_content_type($tmpName) ?: '';
+    $extension = match ($mimeType) {
+        'image/jpeg', 'image/pjpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        default => null,
+    };
+
+    if ($extension === null) {
+        throw new RuntimeException('Only JPG, PNG and WebP player images are supported.');
+    }
+
+    $uploadDir = dirname(__DIR__, 2) . '/public/uploads/players';
+
+    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+        throw new RuntimeException('The player upload directory could not be created.');
+    }
+
+    $filename = date('YmdHis') . '-' . bin2hex(random_bytes(6)) . '.' . $extension;
+    $targetPath = $uploadDir . '/' . $filename;
+
+    if (!move_uploaded_file($tmpName, $targetPath)) {
+        throw new RuntimeException('The player image could not be stored.');
+    }
+
+    return 'uploads/players/' . $filename;
+}
+
+function public_asset_url(string $path, array $config): string
+{
+    $normalizedPath = ltrim($path, '/');
+    $basePath = rtrim((string) ($config['app']['base_path'] ?? ''), '/');
+
+    return $basePath . '/' . $normalizedPath;
+}
+
 function normalizePlayerArray(array $input): array
 {
     return [

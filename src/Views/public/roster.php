@@ -1,6 +1,7 @@
 <?php
 
 $team = $config['team'];
+
 $simulatorConfig = [
     'players' => $simulator['players'],
     'sections' => $simulator['sections'],

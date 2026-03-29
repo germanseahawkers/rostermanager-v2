@@ -10,6 +10,7 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
 use App\Repositories\PlayerRepository;
+use Throwable;
 
 final class AdminPlayerController
 {
@@ -39,8 +40,13 @@ final class AdminPlayerController
 
     public function store(Request $request): Response
     {
-        $repository = new PlayerRepository($this->database->pdo());
-        $repository->create(normalizePlayerPayload($request));
+        try {
+            $repository = new PlayerRepository($this->database->pdo());
+            $repository->create(player_payload_with_uploaded_image($request));
+        } catch (Throwable $exception) {
+            Session::flash('error', $exception->getMessage());
+            return Response::redirect($this->config['app']['base_path'] . '/admin/players');
+        }
 
         Session::flash('success', 'Player created.');
         return Response::redirect($this->config['app']['base_path'] . '/admin/players');
@@ -69,7 +75,19 @@ final class AdminPlayerController
     {
         $id = (int) $request->input('id', 0);
         $repository = new PlayerRepository($this->database->pdo());
-        $repository->update($id, normalizePlayerPayload($request));
+        $existingPlayer = $repository->find($id);
+
+        if ($existingPlayer === null) {
+            Session::flash('error', 'Player not found.');
+            return Response::redirect($this->config['app']['base_path'] . '/admin/players');
+        }
+
+        try {
+            $repository->update($id, player_payload_with_uploaded_image($request, $existingPlayer));
+        } catch (Throwable $exception) {
+            Session::flash('error', $exception->getMessage());
+            return Response::redirect($this->config['app']['base_path'] . '/admin/players/edit?id=' . $id);
+        }
 
         Session::flash('success', 'Player updated.');
         return Response::redirect($this->config['app']['base_path'] . '/admin/players');

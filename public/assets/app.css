@@ -145,6 +145,7 @@ a { color: inherit; }
   width: 48px;
   height: 48px;
   border-radius: 14px;
+  overflow: hidden;
   display: grid;
   place-items: center;
   font-weight: 800;
@@ -156,6 +157,13 @@ a { color: inherit; }
 .selected-grid .player-card .player-avatar {
   background: rgba(255, 255, 255, 0.14);
   color: var(--text);
+}
+
+.player-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .player-name { font-weight: 800; }
