@@ -43,6 +43,12 @@
     return Array.from(selectedIds).sort((a, b) => a - b);
   }
 
+  function imageSrc(path) {
+    const value = String(path || "");
+    if (/^https?:\/\//i.test(value)) return value;
+    return `${state.basePath}/${value.replace(/^\/+/, "")}`;
+  }
+
   function buildShareUrl() {
     const url = new URL(`${state.basePath}/share`, window.location.origin);
     url.searchParams.set("lang", state.locale);
@@ -85,7 +91,7 @@
     }
 
     const avatar = player.image
-      ? `<img class="player-photo" src="${encodeURI(`${state.basePath}/${String(player.image).replace(/^\/+/, "")}`)}" alt="${player.name.replace(/"/g, "&quot;")}">`
+      ? `<img class="player-photo" src="${encodeURI(imageSrc(player.image))}" alt="${player.name.replace(/"/g, "&quot;")}">`
       : (player.abbr || player.position || "?").slice(0, 3);
     const element = document.createElement("button");
     element.type = "button";

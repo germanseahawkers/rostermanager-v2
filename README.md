@@ -60,6 +60,12 @@ Generate a CSV locally from the ESPN roster API and then upload it via the admin
 python3 scripts/import_roster.py
 ```
 
+For a local-image workflow you can also generate a matching ZIP:
+
+```bash
+python3 scripts/import_roster.py --team-slug seahawks --local-images
+```
+
 ## Default admin login
 
 - Username: `admin`

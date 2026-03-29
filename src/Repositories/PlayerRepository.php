@@ -100,9 +100,21 @@ final class PlayerRepository
     {
         $count = 0;
 
-        foreach ($rows as $row) {
-            $this->create($row);
-            $count++;
+        $this->pdo->beginTransaction();
+
+        try {
+            foreach ($rows as $row) {
+                $this->create($row);
+                $count++;
+            }
+
+            $this->pdo->commit();
+        } catch (\Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
         }
 
         return $count;

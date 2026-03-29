@@ -4,4 +4,5 @@
 /public/uploads/players/*
 !/public/uploads/players/.gitkeep
 /database/imports/*.csv
+/database/imports/*.zip
 !/database/imports/.gitkeep

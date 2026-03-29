@@ -385,14 +385,8 @@ function handle_player_image_upload(?array $file): ?string
         throw new RuntimeException('Only JPG, PNG and WebP player images are supported.');
     }
 
-    $uploadDir = dirname(__DIR__, 2) . '/public/uploads/players';
-
-    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
-        throw new RuntimeException('The player upload directory could not be created.');
-    }
-
     $filename = date('YmdHis') . '-' . bin2hex(random_bytes(6)) . '.' . $extension;
-    $targetPath = $uploadDir . '/' . $filename;
+    $targetPath = player_upload_directory() . '/' . $filename;
 
     if (!move_uploaded_file($tmpName, $targetPath)) {
         throw new RuntimeException('The player image could not be stored.');
@@ -401,8 +395,209 @@ function handle_player_image_upload(?array $file): ?string
     return 'uploads/players/' . $filename;
 }
 
+function player_upload_directory(): string
+{
+    $uploadDir = dirname(__DIR__, 2) . '/public/uploads/players';
+
+    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+        throw new RuntimeException('The player upload directory could not be created.');
+    }
+
+    return $uploadDir;
+}
+
+function import_player_images_zip(?array $file): array
+{
+    if ($file === null) {
+        return ['map' => [], 'count' => 0, 'stored_paths' => []];
+    }
+
+    $errorCode = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+
+    if ($errorCode === UPLOAD_ERR_NO_FILE) {
+        return ['map' => [], 'count' => 0, 'stored_paths' => []];
+    }
+
+    if ($errorCode !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('The ZIP upload failed.');
+    }
+
+    if (!class_exists('ZipArchive')) {
+        throw new RuntimeException('ZIP imports require the PHP ZipArchive extension.');
+    }
+
+    $tmpName = (string) ($file['tmp_name'] ?? '');
+
+    if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+        throw new RuntimeException('The uploaded ZIP archive is invalid.');
+    }
+
+    $archive = new ZipArchive();
+
+    if ($archive->open($tmpName) !== true) {
+        throw new RuntimeException('The ZIP archive could not be opened.');
+    }
+
+    $exactMap = [];
+    $basenameMap = [];
+    $basenameConflicts = [];
+    $storedPaths = [];
+    $storedCount = 0;
+
+    for ($index = 0; $index < $archive->numFiles; $index++) {
+        $entryName = (string) $archive->getNameIndex($index);
+        $normalizedEntry = normalize_import_image_reference($entryName);
+
+        if ($normalizedEntry === '' || str_ends_with($normalizedEntry, '/')) {
+            continue;
+        }
+
+        if (str_starts_with($normalizedEntry, '__MACOSX/') || str_starts_with(basename($normalizedEntry), '.')) {
+            continue;
+        }
+
+        $contents = $archive->getFromIndex($index);
+
+        if (!is_string($contents) || $contents === '') {
+            continue;
+        }
+
+        $relativePath = store_imported_player_image_contents($contents, basename($normalizedEntry));
+        $storedPaths[] = $relativePath;
+        $exactMap[$normalizedEntry] = $relativePath;
+
+        $basename = basename($normalizedEntry);
+
+        if (!isset($basenameConflicts[$basename])) {
+            if (isset($basenameMap[$basename])) {
+                unset($basenameMap[$basename]);
+                $basenameConflicts[$basename] = true;
+            } else {
+                $basenameMap[$basename] = $relativePath;
+            }
+        }
+
+        $storedCount++;
+    }
+
+    $archive->close();
+
+    if ($storedCount === 0) {
+        throw new RuntimeException('The ZIP archive did not contain any valid JPG, PNG or WebP images.');
+    }
+
+    return [
+        'map' => array_merge($exactMap, $basenameMap),
+        'count' => $storedCount,
+        'stored_paths' => $storedPaths,
+    ];
+}
+
+function normalize_import_image_reference(string $value): string
+{
+    $normalized = trim(str_replace('\\', '/', $value));
+
+    while (str_starts_with($normalized, './')) {
+        $normalized = substr($normalized, 2);
+    }
+
+    return ltrim($normalized, '/');
+}
+
+function store_imported_player_image_contents(string $contents, string $originalName): string
+{
+    $mimeType = null;
+
+    if (function_exists('finfo_buffer')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo !== false) {
+            $mimeType = finfo_buffer($finfo, $contents) ?: null;
+            finfo_close($finfo);
+        }
+    }
+
+    $extension = match ($mimeType) {
+        'image/jpeg', 'image/pjpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        default => null,
+    };
+
+    if ($extension === null) {
+        $suffix = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $extension = match ($suffix) {
+            'jpg', 'jpeg' => 'jpg',
+            'png' => 'png',
+            'webp' => 'webp',
+            default => null,
+        };
+    }
+
+    if ($extension === null) {
+        throw new RuntimeException(sprintf('Unsupported image in ZIP archive: %s', $originalName));
+    }
+
+    $filename = date('YmdHis') . '-' . bin2hex(random_bytes(6)) . '.' . $extension;
+    $targetPath = player_upload_directory() . '/' . $filename;
+
+    if (file_put_contents($targetPath, $contents) === false) {
+        throw new RuntimeException(sprintf('Could not store imported image: %s', $originalName));
+    }
+
+    return 'uploads/players/' . $filename;
+}
+
+function resolve_imported_player_image(array $row, array $imageMap): array
+{
+    $image = trim((string) ($row['image'] ?? ''));
+
+    if ($image === '' || $imageMap === []) {
+        return $row;
+    }
+
+    if (preg_match('#^https?://#i', $image) === 1) {
+        return $row;
+    }
+
+    $normalizedImage = normalize_import_image_reference($image);
+
+    if ($normalizedImage !== '' && isset($imageMap[$normalizedImage])) {
+        $row['image'] = $imageMap[$normalizedImage];
+        return $row;
+    }
+
+    if (!str_starts_with($normalizedImage, 'uploads/players/')) {
+        throw new RuntimeException(sprintf('Image reference not found in ZIP archive: %s', $image));
+    }
+
+    return $row;
+}
+
+function cleanup_imported_player_images(array $relativePaths): void
+{
+    $basePath = dirname(__DIR__, 2) . '/public/';
+
+    foreach ($relativePaths as $relativePath) {
+        $normalizedPath = ltrim((string) $relativePath, '/');
+
+        if ($normalizedPath === '' || !str_starts_with($normalizedPath, 'uploads/players/')) {
+            continue;
+        }
+
+        $absolutePath = $basePath . $normalizedPath;
+
+        if (is_file($absolutePath)) {
+            @unlink($absolutePath);
+        }
+    }
+}
+
 function public_asset_url(string $path, array $config): string
 {
+    if (preg_match('#^https?://#i', $path) === 1) {
+        return $path;
+    }
+
     $normalizedPath = ltrim($path, '/');
     $basePath = rtrim((string) ($config['app']['base_path'] ?? ''), '/');
 

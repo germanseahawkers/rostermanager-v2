@@ -104,46 +104,58 @@ final class AdminPlayerController
 
     public function importCsv(Request $request): Response
     {
-        $file = $request->file('csv');
+        $storedImagePaths = [];
 
-        if ($file === null || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            Session::flash('error', 'Please upload a valid CSV file.');
-            return Response::redirect($this->config['app']['base_path'] . '/admin/players');
-        }
+        try {
+            $file = $request->file('csv');
 
-        $handle = fopen($file['tmp_name'], 'rb');
-
-        if ($handle === false) {
-            Session::flash('error', 'The CSV file could not be read.');
-            return Response::redirect($this->config['app']['base_path'] . '/admin/players');
-        }
-
-        $header = fgetcsv($handle);
-
-        if ($header === false) {
-            fclose($handle);
-            Session::flash('error', 'The CSV file is empty.');
-            return Response::redirect($this->config['app']['base_path'] . '/admin/players');
-        }
-
-        $rows = [];
-
-        while (($line = fgetcsv($handle)) !== false) {
-            $row = array_combine($header, $line);
-
-            if ($row === false) {
-                continue;
+            if ($file === null || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                throw new \RuntimeException('Please upload a valid CSV file.');
             }
 
-            $rows[] = normalizePlayerArray($row);
+            $handle = fopen($file['tmp_name'], 'rb');
+
+            if ($handle === false) {
+                throw new \RuntimeException('The CSV file could not be read.');
+            }
+
+            $header = fgetcsv($handle);
+
+            if ($header === false) {
+                fclose($handle);
+                throw new \RuntimeException('The CSV file is empty.');
+            }
+
+            $zipImport = import_player_images_zip($request->file('images_zip'));
+            $storedImagePaths = $zipImport['stored_paths'];
+            $rows = [];
+
+            while (($line = fgetcsv($handle)) !== false) {
+                $row = array_combine($header, $line);
+
+                if ($row === false) {
+                    continue;
+                }
+
+                $rows[] = normalizePlayerArray(resolve_imported_player_image($row, $zipImport['map']));
+            }
+
+            fclose($handle);
+
+            $repository = new PlayerRepository($this->database->pdo());
+            $count = $repository->import($rows);
+            $message = sprintf('%d player(s) imported.', $count);
+
+            if (($zipImport['count'] ?? 0) > 0) {
+                $message .= sprintf(' %d image(s) stored locally.', (int) $zipImport['count']);
+            }
+
+            Session::flash('success', $message);
+        } catch (Throwable $exception) {
+            cleanup_imported_player_images($storedImagePaths);
+            Session::flash('error', $exception->getMessage());
         }
 
-        fclose($handle);
-
-        $repository = new PlayerRepository($this->database->pdo());
-        $count = $repository->import($rows);
-
-        Session::flash('success', sprintf('%d player(s) imported.', $count));
         return Response::redirect($this->config['app']['base_path'] . '/admin/players');
     }
 }
