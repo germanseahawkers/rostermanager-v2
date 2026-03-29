@@ -247,7 +247,7 @@ th, td {
 .notice { padding: 0.9rem 1rem; margin-bottom: 1rem; }
 .notice.error { border-color: rgba(179, 58, 58, 0.35); color: #7f1d1d; background: rgba(179, 58, 58, 0.07); }
 .notice.success { border-color: rgba(13, 107, 93, 0.35); color: var(--primary); background: rgba(13, 107, 93, 0.07); }
-.split { display: grid; gap: 1.25rem; grid-template-columns: 2fr 1fr; }
+.split { display: grid; gap: 1.25rem; grid-template-columns: 2fr 1fr; align-items: start; }
 .toolbar {
   display: flex;
   justify-content: space-between;
