@@ -115,3 +115,9 @@ For production, set your own `ADMIN_PASSWORD_HASH` and remove the plain fallback
 - The frontend can handle both absolute image URLs and local uploaded image paths.
 - Simulator grouping is intentionally driven by the aliases in [`config/team.php`](config/team.php), not by the raw imported position alone.
 - The Python importer includes an `--insecure` fallback for local SSL issues on macOS Python setups.
+
+## License and asset notice
+
+The source code in this repository is licensed under the [MIT License](LICENSE).
+
+Please note that this does not automatically apply to third-party names, logos, trademarks, player photos or other external content referenced or imported by the project. If you publish a public instance or redistribute assets, make sure you have the necessary rights for those materials.
