@@ -25,7 +25,7 @@ final class Request
             $path = substr($path, strlen($normalizedBasePath)) ?: '/';
         }
 
-        return $path === '' ? '/' : rtrim($path, '/') ?: '/';
+        return $path === '' ? '/' : (rtrim($path, '/') ?: '/');
     }
 
     public function input(string $key, mixed $default = null): mixed
