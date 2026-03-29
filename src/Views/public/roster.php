@@ -38,8 +38,12 @@ ob_start();
         <h2><?= htmlspecialchars($team['nickname'] . ' Cutdown', ENT_QUOTES, 'UTF-8') ?></h2>
         <p class="muted"><?= htmlspecialchars($t['intro_body'], ENT_QUOTES, 'UTF-8') ?></p>
         <div class="locale-switcher">
-            <a class="button secondary" href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/?lang=de">DE</a>
-            <a class="button secondary" href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/?lang=en">EN</a>
+            <?php foreach (($availableLocales ?? supported_locales()) as $localeCode => $localeLabel): ?>
+                <a
+                    class="button<?= $localeCode === $locale ? '' : ' secondary' ?>"
+                    href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/?lang=<?= htmlspecialchars($localeCode, ENT_QUOTES, 'UTF-8') ?>"
+                ><?= htmlspecialchars($localeLabel, ENT_QUOTES, 'UTF-8') ?></a>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>

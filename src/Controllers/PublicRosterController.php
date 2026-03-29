@@ -20,7 +20,7 @@ final class PublicRosterController
 
     public function index(Request $request): Response
     {
-        $locale = in_array($request->query('lang', 'de'), ['de', 'en'], true) ? (string) $request->query('lang', 'de') : 'de';
+        $locale = resolve_locale($request->query('lang', 'de'));
         $translations = translations($locale);
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
@@ -35,6 +35,7 @@ final class PublicRosterController
         return Response::html(View::make('public/roster', [
             'config' => $this->config,
             'locale' => $locale,
+            'availableLocales' => supported_locales(),
             't' => $translations,
             'simulator' => $simulator,
             'shareUrl' => $this->config['app']['base_path'] . '/share?lang=' . $locale,
@@ -43,7 +44,7 @@ final class PublicRosterController
 
     public function share(Request $request): Response
     {
-        $locale = in_array($request->query('lang', 'de'), ['de', 'en'], true) ? (string) $request->query('lang', 'de') : 'de';
+        $locale = resolve_locale($request->query('lang', 'de'));
         $translations = translations($locale);
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
@@ -68,7 +69,7 @@ final class PublicRosterController
 
     public function shareCard(Request $request): Response
     {
-        $locale = in_array($request->query('lang', 'de'), ['de', 'en'], true) ? (string) $request->query('lang', 'de') : 'de';
+        $locale = resolve_locale($request->query('lang', 'de'));
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
         $simulator = build_simulator_payload(

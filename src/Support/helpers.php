@@ -4,6 +4,25 @@ declare(strict_types=1);
 
 use App\Core\Request;
 
+function supported_locales(): array
+{
+    return [
+        'de' => 'DE',
+        'en' => 'EN',
+        'es' => 'ES',
+        'fr' => 'FR',
+        'pt' => 'PT',
+    ];
+}
+
+function resolve_locale(mixed $value, string $default = 'de'): string
+{
+    $locale = is_string($value) ? strtolower(trim($value)) : '';
+    $supported = supported_locales();
+
+    return array_key_exists($locale, $supported) ? $locale : $default;
+}
+
 function config_value(array $config, string $key, mixed $default = null): mixed
 {
     $segments = explode('.', $key);
@@ -79,6 +98,10 @@ function translations(string $locale): array
             'share_caption' => 'Mein 53-Man-Roster für den Cutdown Day',
             'copy_done' => 'Link kopiert',
             'review_hint' => 'Tipp: Du kannst die Auswahl jederzeit per URL weitergeben.',
+            'group_offense' => 'Offense',
+            'group_defense' => 'Defense',
+            'group_special_teams' => 'Special Teams',
+            'share_card_subtitle' => 'Mein Cutdown-Roster',
         ],
         'en' => [
             'nav_roster' => 'Simulator',
@@ -117,6 +140,136 @@ function translations(string $locale): array
             'share_caption' => 'My 53-man roster for cutdown day',
             'copy_done' => 'Link copied',
             'review_hint' => 'Tip: you can share the current selection any time via URL.',
+            'group_offense' => 'Offense',
+            'group_defense' => 'Defense',
+            'group_special_teams' => 'Special Teams',
+            'share_card_subtitle' => 'My cutdown roster',
+        ],
+        'es' => [
+            'nav_roster' => 'Simulador',
+            'nav_admin' => 'Admin',
+            'headline' => 'Simulador del roster de 53 jugadores',
+            'subline' => 'Crea tu roster final de recortes a partir del plantel completo de 90 jugadores.',
+            'intro_title' => 'De 90 a 53',
+            'intro_body' => 'Elige jugadores del roster completo del campamento, sigue en vivo tu contador de cortes y comparte el resultado con tu comunidad.',
+            'tab_available' => 'Jugadores disponibles',
+            'tab_selected' => 'Tu roster',
+            'share_title' => 'Compartir y debatir',
+            'share_body' => 'Cada resultado recibe su propia URL y una imagen para compartir generada automáticamente.',
+            'review_title' => 'Revisión',
+            'review_body' => 'Revisa tu roster final de 53 y compártelo en WhatsApp, redes sociales o directamente con tu peña.',
+            'copy_link' => 'Copiar enlace',
+            'open_share' => 'Abrir página compartida',
+            'download_card' => 'Abrir imagen compartida',
+            'share_whatsapp' => 'Compartir por WhatsApp',
+            'share_native' => 'Compartir',
+            'available_label' => 'Jugadores disponibles',
+            'selected_roster' => 'Tu roster de 53',
+            'empty_state' => 'Actualmente no hay jugadores para este grupo de posiciones.',
+            'experience' => 'Experiencia',
+            'height' => 'Altura',
+            'weight' => 'Peso',
+            'summary_total' => 'Total',
+            'summary_short' => 'de',
+            'selected_label' => 'Seleccionados',
+            'remaining_label' => 'Restantes',
+            'status_complete' => 'Roster completo',
+            'status_incomplete' => 'Aún no está completo',
+            'built_with' => 'Simulador open source de cortes del roster NFL',
+            'made_for' => 'Branding del equipo y lógica de posiciones configurables de forma central',
+            'share_page_title' => 'Roster compartido',
+            'load_this_roster' => 'Abrir este roster en el simulador',
+            'share_caption' => 'Mi roster de 53 para el día de cortes',
+            'copy_done' => 'Enlace copiado',
+            'review_hint' => 'Consejo: puedes compartir la selección actual en cualquier momento mediante URL.',
+            'group_offense' => 'Ataque',
+            'group_defense' => 'Defensa',
+            'group_special_teams' => 'Equipos especiales',
+            'share_card_subtitle' => 'Mi roster de recortes',
+        ],
+        'fr' => [
+            'nav_roster' => 'Simulateur',
+            'nav_admin' => 'Admin',
+            'headline' => 'Simulateur d’effectif à 53 joueurs',
+            'subline' => 'Compose ton effectif final de coupe à partir du groupe complet de 90 joueurs.',
+            'intro_title' => 'De 90 à 53',
+            'intro_body' => 'Choisis des joueurs dans l’effectif complet du camp, suis ton compteur de coupes en direct et partage le résultat avec ta communauté.',
+            'tab_available' => 'Joueurs disponibles',
+            'tab_selected' => 'Ton effectif',
+            'share_title' => 'Partager et débattre',
+            'share_body' => 'Chaque résultat reçoit sa propre URL ainsi qu’un visuel de partage généré automatiquement.',
+            'review_title' => 'Revue',
+            'review_body' => 'Vérifie ton effectif final de 53 joueurs et partage-le sur WhatsApp, les réseaux sociaux ou directement avec ton fan club.',
+            'copy_link' => 'Copier le lien',
+            'open_share' => 'Ouvrir la page de partage',
+            'download_card' => 'Ouvrir le visuel de partage',
+            'share_whatsapp' => 'Partager sur WhatsApp',
+            'share_native' => 'Partager',
+            'available_label' => 'Joueurs disponibles',
+            'selected_roster' => 'Ton effectif de 53',
+            'empty_state' => 'Aucun joueur n’est actuellement disponible pour ce groupe de positions.',
+            'experience' => 'Expérience',
+            'height' => 'Taille',
+            'weight' => 'Poids',
+            'summary_total' => 'Total',
+            'summary_short' => 'sur',
+            'selected_label' => 'Sélectionnés',
+            'remaining_label' => 'Restants',
+            'status_complete' => 'Effectif complet',
+            'status_incomplete' => 'Pas encore complet',
+            'built_with' => 'Simulateur open source de coupe d’effectif NFL',
+            'made_for' => 'Branding d’équipe et logique de positions configurables de façon centralisée',
+            'share_page_title' => 'Effectif partagé',
+            'load_this_roster' => 'Ouvrir cet effectif dans le simulateur',
+            'share_caption' => 'Mon effectif de 53 joueurs pour le cutdown day',
+            'copy_done' => 'Lien copié',
+            'review_hint' => 'Astuce : tu peux partager la sélection actuelle à tout moment via URL.',
+            'group_offense' => 'Attaque',
+            'group_defense' => 'Défense',
+            'group_special_teams' => 'Équipes spéciales',
+            'share_card_subtitle' => 'Mon effectif final',
+        ],
+        'pt' => [
+            'nav_roster' => 'Simulador',
+            'nav_admin' => 'Admin',
+            'headline' => 'Simulador do elenco de 53 jogadores',
+            'subline' => 'Monte o seu elenco final de cortes a partir do grupo completo de 90 jogadores.',
+            'intro_title' => 'De 90 para 53',
+            'intro_body' => 'Escolha jogadores do elenco completo do camp, acompanhe ao vivo o seu contador de cortes e compartilhe o resultado com a sua comunidade.',
+            'tab_available' => 'Jogadores disponíveis',
+            'tab_selected' => 'Seu elenco',
+            'share_title' => 'Compartilhar e discutir',
+            'share_body' => 'Cada resultado recebe sua própria URL e uma arte de compartilhamento gerada automaticamente.',
+            'review_title' => 'Revisão',
+            'review_body' => 'Revise seu elenco final de 53 jogadores e compartilhe no WhatsApp, nas redes sociais ou diretamente com o seu fã-clube.',
+            'copy_link' => 'Copiar link',
+            'open_share' => 'Abrir página compartilhada',
+            'download_card' => 'Abrir arte de compartilhamento',
+            'share_whatsapp' => 'Compartilhar no WhatsApp',
+            'share_native' => 'Compartilhar',
+            'available_label' => 'Jogadores disponíveis',
+            'selected_roster' => 'Seu elenco de 53',
+            'empty_state' => 'No momento não há jogadores disponíveis para este grupo de posições.',
+            'experience' => 'Experiência',
+            'height' => 'Altura',
+            'weight' => 'Peso',
+            'summary_total' => 'Total',
+            'summary_short' => 'de',
+            'selected_label' => 'Selecionados',
+            'remaining_label' => 'Restantes',
+            'status_complete' => 'Elenco completo',
+            'status_incomplete' => 'Ainda não está completo',
+            'built_with' => 'Simulador open source de cortes de elenco da NFL',
+            'made_for' => 'Branding do time e lógica de posições configuráveis de forma central',
+            'share_page_title' => 'Elenco compartilhado',
+            'load_this_roster' => 'Abrir este elenco no simulador',
+            'share_caption' => 'Meu elenco de 53 jogadores para o cutdown day',
+            'copy_done' => 'Link copiado',
+            'review_hint' => 'Dica: você pode compartilhar a seleção atual a qualquer momento por URL.',
+            'group_offense' => 'Ataque',
+            'group_defense' => 'Defesa',
+            'group_special_teams' => 'Times especiais',
+            'share_card_subtitle' => 'Meu elenco final',
         ],
     ];
 
@@ -138,9 +291,10 @@ function parse_roster_selection(string $rosterValue): array
 function simulator_group_map(array $groups, string $locale): array
 {
     $map = [];
+    $fallbackLocale = $locale === 'de' ? 'de' : 'en';
 
     foreach ($groups as $group) {
-        $labelKey = $locale === 'de' ? 'label_de' : 'label_en';
+        $labelKey = $fallbackLocale === 'de' ? 'label_de' : 'label_en';
         $map[$group['key']] = [
             'key' => $group['key'],
             'section' => $group['section'],
@@ -168,6 +322,7 @@ function simulator_group_key(string $position, array $groups): string
 function build_simulator_payload(array $players, array $groups, string $locale, array $selectedIds, int $rosterLimit): array
 {
     $groupMap = simulator_group_map($groups, $locale);
+    $t = translations($locale);
     $playersByGroup = [];
     $selectedLookup = array_fill_keys(array_map('intval', $selectedIds), true);
     $selectedPlayers = [];
@@ -208,9 +363,9 @@ function build_simulator_payload(array $players, array $groups, string $locale, 
     }
 
     $sections = [
-        'offense' => ['key' => 'offense', 'label' => $locale === 'de' ? 'Offense' : 'Offense', 'groups' => []],
-        'defense' => ['key' => 'defense', 'label' => $locale === 'de' ? 'Defense' : 'Defense', 'groups' => []],
-        'special_teams' => ['key' => 'special_teams', 'label' => 'Special Teams', 'groups' => []],
+        'offense' => ['key' => 'offense', 'label' => $t['group_offense'], 'groups' => []],
+        'defense' => ['key' => 'defense', 'label' => $t['group_defense'], 'groups' => []],
+        'special_teams' => ['key' => 'special_teams', 'label' => $t['group_special_teams'], 'groups' => []],
     ];
 
     foreach ($playersByGroup as $groupKey => $group) {
@@ -248,8 +403,9 @@ function render_share_card_svg(array $simulator, array $config, string $locale):
 {
     $team = $config['team'];
     $colors = $team['colors'];
+    $t = translations($locale);
     $title = svg_escape($team['name'] . ' 53-Man');
-    $subtitle = svg_escape(($locale === 'de' ? 'Mein Cutdown-Roster' : 'My cutdown roster') . ' · ' . count($simulator['selected_ids']) . '/' . $simulator['roster_limit']);
+    $subtitle = svg_escape($t['share_card_subtitle'] . ' · ' . count($simulator['selected_ids']) . '/' . $simulator['roster_limit']);
     $rows = [];
     $y = 240;
 
