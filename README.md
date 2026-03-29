@@ -4,6 +4,8 @@
 
 The current product focus is a team-branded 90-to-53 roster cut simulator with a lightweight admin backend for managing players and importing roster data.
 
+Published by German Sea Hawkers e.V. and developed by Simon Kell.
+
 ## What it does
 
 - Public 53-man roster simulator
