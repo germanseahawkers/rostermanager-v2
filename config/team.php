@@ -31,9 +31,7 @@ return [
             ['key' => 'LB', 'section' => 'defense', 'label_de' => 'Linebacker', 'label_en' => 'Linebacker', 'aliases' => ['LB', 'ILB', 'OLB', 'EDGE']],
             ['key' => 'CB', 'section' => 'defense', 'label_de' => 'Cornerback', 'label_en' => 'Cornerback', 'aliases' => ['CB']],
             ['key' => 'S', 'section' => 'defense', 'label_de' => 'Safety', 'label_en' => 'Safety', 'aliases' => ['S', 'FS', 'SS', 'DB']],
-            ['key' => 'K', 'section' => 'special_teams', 'label_de' => 'Kicker', 'label_en' => 'Kicker', 'aliases' => ['K', 'PK']],
-            ['key' => 'P', 'section' => 'special_teams', 'label_de' => 'Punter', 'label_en' => 'Punter', 'aliases' => ['P']],
-            ['key' => 'LS', 'section' => 'special_teams', 'label_de' => 'Long Snapper', 'label_en' => 'Long Snapper', 'aliases' => ['LS']],
+            ['key' => 'ST', 'section' => 'special_teams', 'label_de' => 'Special Teams', 'label_en' => 'Special Teams', 'aliases' => ['ST', 'K', 'PK', 'P', 'LS']],
         ],
     ],
 ];
