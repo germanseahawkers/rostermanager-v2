@@ -141,10 +141,23 @@ final class AdminPlayerController
             }
 
             fclose($handle);
+            $usesIds = import_rows_use_ids($rows);
 
             $repository = new PlayerRepository($this->database->pdo());
-            $count = $repository->import($rows);
-            $message = sprintf('%d player(s) imported.', $count);
+            $stats = $repository->import($rows);
+            $message = sprintf('%d player(s) created.', (int) $stats['created']);
+
+            if ((int) $stats['updated'] > 0) {
+                $message .= sprintf(' %d updated.', (int) $stats['updated']);
+            }
+
+            if ((int) $stats['deleted'] > 0) {
+                $message .= sprintf(' %d deleted because they were not present in the ID-based import.', (int) $stats['deleted']);
+            }
+
+            if ($usesIds) {
+                $message .= ' Ordering was preserved for updated players.';
+            }
 
             if (($zipImport['count'] ?? 0) > 0) {
                 $message .= sprintf(' %d image(s) stored locally.', (int) $zipImport['count']);

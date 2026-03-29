@@ -295,10 +295,11 @@ def write_csv(rows: Iterable[PlayerRow], output_path: Path) -> None:
 
     with output_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["name", "position", "abbr", "experience", "weight_kg", "height_cm", "image", "ordering"])
+        writer.writerow(["id", "name", "position", "abbr", "experience", "weight_kg", "height_cm", "image", "ordering"])
 
         for row in rows:
             writer.writerow([
+                row.player_id,
                 row.name,
                 row.position,
                 row.abbr,

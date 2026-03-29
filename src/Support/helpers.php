@@ -321,6 +321,7 @@ function svg_wrap_lines(string $text, int $maxLength): array
 function normalizePlayerPayload(Request $request): array
 {
     return normalizePlayerArray([
+        'id' => $request->input('id', ''),
         'name' => $request->input('name', ''),
         'position' => $request->input('position', ''),
         'abbr' => $request->input('abbr', ''),
@@ -606,6 +607,17 @@ function public_asset_url(string $path, array $config): string
 
 function normalizePlayerArray(array $input): array
 {
+    $id = null;
+    if (array_key_exists('id', $input)) {
+        $rawId = trim((string) ($input['id'] ?? ''));
+        if ($rawId !== '') {
+            if (!ctype_digit($rawId)) {
+                throw new RuntimeException(sprintf('Invalid player id: %s', $rawId));
+            }
+            $id = (int) $rawId;
+        }
+    }
+
     $hasMetricHeight = array_key_exists('height_cm', $input) && (string) $input['height_cm'] !== '';
     $hasMetricWeight = array_key_exists('weight_kg', $input) && (string) $input['weight_kg'] !== '';
     $heightCm = parse_height_to_cm(
@@ -617,7 +629,7 @@ function normalizePlayerArray(array $input): array
         $hasMetricWeight ? 'metric' : 'legacy'
     );
 
-    return [
+    $normalized = [
         'name' => trim((string) ($input['name'] ?? '')),
         'position' => strtoupper(trim((string) ($input['position'] ?? ''))),
         'abbr' => strtoupper(trim((string) ($input['abbr'] ?? ''))),
@@ -627,6 +639,33 @@ function normalizePlayerArray(array $input): array
         'image' => trim((string) ($input['image'] ?? '')),
         'ordering' => (int) ($input['ordering'] ?? 0),
     ];
+
+    if ($id !== null) {
+        $normalized['id'] = $id;
+    }
+
+    return $normalized;
+}
+
+function import_rows_use_ids(array $rows): bool
+{
+    $rowsWithId = 0;
+
+    foreach ($rows as $row) {
+        if (isset($row['id']) && $row['id'] !== null) {
+            $rowsWithId++;
+        }
+    }
+
+    if ($rowsWithId === 0) {
+        return false;
+    }
+
+    if ($rowsWithId !== count($rows)) {
+        throw new RuntimeException('Mass import with IDs requires an id value in every CSV row.');
+    }
+
+    return true;
 }
 
 function metric_height_cm(array $player): ?int

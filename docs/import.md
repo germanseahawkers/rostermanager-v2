@@ -60,17 +60,19 @@ That is only meant as a local fallback. The preferred long-term fix is to instal
 The script writes a CSV with these headers:
 
 ```text
-name,position,abbr,experience,weight_kg,height_cm,image,ordering
+id,name,position,abbr,experience,weight_kg,height_cm,image,ordering
 ```
 
 Notes:
 
+- `id` is optional, but recommended for recurring offseason sync imports
 - The real ESPN position abbreviation is preserved in `position`
 - Simulator grouping still happens through the aliases in [`config/team.php`](../config/team.php)
 - Height is normalized to centimeters
 - Weight is normalized to kilograms
 - By default, `image` uses the ESPN `headshot.href` value when available
 - With `--local-images`, `image` contains the local filename that is also written into the ZIP archive
+- The ESPN importer writes the ESPN player ID into the CSV `id` column
 
 ## Admin import modes
 
@@ -80,6 +82,15 @@ The admin backend supports two import modes:
    Use this when the `image` column contains absolute URLs or is empty.
 2. CSV plus ZIP
    Use this when the CSV was generated with `--local-images`.
+
+Import behavior depends on the CSV:
+
+- Without `id`, each row is inserted as a new player record
+- With `id` in every row, the import becomes a sync
+- Existing IDs are updated
+- New IDs are inserted
+- Players not present in the uploaded ID list are deleted
+- Ordering is not overwritten for existing players during ID-based updates
 
 In CSV plus ZIP mode:
 

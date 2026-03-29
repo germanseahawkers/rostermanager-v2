@@ -103,6 +103,13 @@ The admin player import supports two modes:
 
 In the CSV + ZIP flow, the backend stores the uploaded player images locally in `public/uploads/players/` and rewrites the imported image paths accordingly.
 
+If the CSV includes an `id` column for every row, the import switches to sync mode:
+
+- existing IDs are updated
+- new IDs are created
+- players missing from the uploaded ID set are deleted
+- existing player ordering is preserved during updates
+
 ## Default admin login
 
 - Username: `admin`
@@ -115,6 +122,7 @@ For production, set your own `ADMIN_PASSWORD_HASH` and remove the plain fallback
 - The frontend can handle both absolute image URLs and local uploaded image paths.
 - Simulator grouping is intentionally driven by the aliases in [`config/team.php`](config/team.php), not by the raw imported position alone.
 - The Python importer includes an `--insecure` fallback for local SSL issues on macOS Python setups.
+- `ordering` is only a manual display-order field for admin and simulator lists. The importer uses gaps like `10, 20, 30` so later reordering is easier.
 
 ## License and asset notice
 

@@ -101,6 +101,8 @@ ob_start();
                 </label>
             </div>
 
+            <p class="hint">Ordering only controls manual display order in admin and simulator lists. Using gaps like 10, 20, 30 makes later reordering easier.</p>
+
             <?php if (!empty($player['image'])): ?>
                 <div class="stack">
                     <span class="hint">Current player image</span>
@@ -123,7 +125,8 @@ ob_start();
         <form class="form-panel stack" method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players/import">
             <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
             <h2>CSV import</h2>
-            <p class="hint">Expected header: <code>name,position,abbr,experience,weight_kg,height_cm,image,ordering</code>. Optional: upload a ZIP of player images if the CSV contains local image filenames.</p>
+            <p class="hint">Expected header: <code>id,name,position,abbr,experience,weight_kg,height_cm,image,ordering</code>. The <code>id</code> column is optional.</p>
+            <p class="hint">Without IDs, every row is imported as a new player. With IDs in every row, the import becomes a sync: existing IDs are updated, missing IDs are deleted, and ordering is preserved for updated players.</p>
             <label>
                 CSV file
                 <input type="file" name="csv" accept=".csv,text/csv" required>
