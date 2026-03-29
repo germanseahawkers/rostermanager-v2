@@ -9,5 +9,6 @@ $content = sprintf(
 echo App\Core\View::make('layouts/app', [
     'config' => $config ?? ['app' => ['name' => 'RosterManager v2', 'base_path' => '']],
     'title' => $title ?? 'Error',
+    'lang' => 'en',
     'content' => $content,
 ]);

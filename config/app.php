@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'app' => [
-        'name' => getenv('APP_NAME') ?: 'RosterManager v2',
+        'name' => getenv('APP_NAME') ?: ((getenv('TEAM_NAME') ?: 'NFL Team') . ' Roster Simulator'),
         'base_path' => rtrim(getenv('APP_BASE_PATH') ?: '', '/'),
         'debug' => filter_var(getenv('APP_DEBUG') ?: false, FILTER_VALIDATE_BOOL),
     ],
@@ -22,4 +22,5 @@ return [
         'password_hash' => getenv('ADMIN_PASSWORD_HASH')
             ?: password_hash(getenv('ADMIN_PASSWORD') ?: 'admin123', PASSWORD_DEFAULT),
     ],
+    'team' => require __DIR__ . '/team.php',
 ];

@@ -42,6 +42,21 @@ final class PlayerRepository
         return $grouped;
     }
 
+    public function findManyByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+
+        if ($ids === []) {
+            return [];
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($ids), '?'));
+        $statement = $this->pdo->prepare('SELECT * FROM players WHERE id IN (' . $placeholders . ')');
+        $statement->execute($ids);
+
+        return $statement->fetchAll();
+    }
+
     public function find(int $id): ?array
     {
         $statement = $this->pdo->prepare('SELECT * FROM players WHERE id = :id');

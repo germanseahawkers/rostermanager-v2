@@ -16,12 +16,25 @@ This keeps deployment simple and still gives us a clean separation between routi
 
 ## MVP scope
 
-- Public roster page
-- Group players by position
+- Public 90-to-53 roster cut simulator
+- Team-configurable branding and position groups
 - German/English language toggle
+- Shareable result URLs
+- Server-generated SVG share card
 - Admin login
 - Player CRUD
 - CSV import for players
+
+## Reuse for other teams
+
+Team-specific values are centralized in [config/team.php](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/config/team.php) and can also be overridden via [.env.example](/Users/simonkell/kDrive/German Sea Hawkers/rostermanager-v2/.env.example):
+
+- team name, city and nickname
+- color palette
+- tagline
+- logo path
+- roster limit
+- position group mapping
 
 ## Current structure
 

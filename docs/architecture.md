@@ -19,17 +19,28 @@
 ## MVP-Zuschnitt
 
 - Öffentlich:
-  - Rosterliste nach Position gruppiert
-  - Filter nach Position
+  - 90-to-53 roster cut simulator
+  - Positionsgruppen als konfigurierbare Tabs
+  - Live-Zähler und Review-Bereich
   - Sprachumschaltung Deutsch/Englisch
+  - Share-URL pro Ergebnis
+  - Serverseitig gerenderte SVG-Share-Grafik
 - Admin:
   - Login mit einem einfachen Admin-Zugang
   - Spieler anlegen, bearbeiten, löschen
   - CSV-Import für Spieler
 - Vorbereitet, aber noch bewusst nicht umgesetzt:
   - Rollenmodell mit mehreren Benutzern
-  - Upload-Management für Bilder
-  - Export/Veröffentlichungsworkflow
+  - Persistente Ergebnis-Speicherung
+  - Team-/Saisonverwaltung im Backend
+  - Automatische OG/Social-Meta-Ausgabe für Crawler
+
+## Open-Source-Fokus
+
+- Team-Name, Farben, Tagline und Logo-Pfad liegen zentral in `config/team.php`
+- Alle Teamwerte können zusätzlich per `.env` überschrieben werden
+- Positionsgruppen und Aliase sind zentral konfigurierbar
+- Damit kann dieselbe Codebasis von anderen NFL-Fanklubs mit wenig Aufwand übernommen werden
 
 ## Ordnerstruktur
 
