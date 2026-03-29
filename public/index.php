@@ -6,6 +6,7 @@ use App\Controllers\AdminPlayerController;
 use App\Controllers\AuthController;
 use App\Controllers\PublicRosterController;
 use App\Core\App;
+use App\Core\Autoloader;
 use App\Core\Database;
 use App\Core\Request;
 use App\Core\Router;
@@ -14,7 +15,7 @@ use App\Core\Session;
 require_once __DIR__ . '/../src/Core/Autoloader.php';
 require_once __DIR__ . '/../src/Support/helpers.php';
 
-$autoloader = new App\Core\Autoloader(__DIR__ . '/../src');
+$autoloader = new Autoloader(__DIR__ . '/../src');
 $autoloader->register();
 
 $config = require __DIR__ . '/../config/app.php';
