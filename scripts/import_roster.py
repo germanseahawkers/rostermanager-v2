@@ -84,6 +84,27 @@ def extract_active_names(html_source: str) -> list[str]:
     return names
 
 
+def extract_active_block_lines(html_source: str) -> list[str]:
+    lines = extract_text_lines(html_source)
+
+    try:
+        start_index = lines.index("Active  Player # Pos HT WT Age Exp College") + 1
+    except ValueError:
+        try:
+            start_index = lines.index("#### Active") + 1
+        except ValueError as exc:
+            raise RuntimeError("Could not find active roster section in source page.") from exc
+
+    active_lines: list[str] = []
+
+    for line in lines[start_index:]:
+        if line in {"Advertising", "### CLUB PARTNERS", "Club Links", "NFL Clubs"}:
+            break
+        active_lines.append(line)
+
+    return active_lines
+
+
 def parse_height_to_cm(height: str) -> int | None:
     height = height.strip()
     match = re.match(r"^(\d+)-(\d+)$", height)
@@ -129,67 +150,53 @@ def extract_profile_urls(html_source: str, base_url: str) -> dict[str, str]:
 
 
 def build_rows(roster_html: str, base_url: str, ordering_step: int = 10, insecure: bool = False) -> list[PlayerRow]:
-    lines = extract_text_lines(roster_html)
-    names = extract_active_names(roster_html)
+    lines = extract_active_block_lines(roster_html)
     profiles = extract_profile_urls(roster_html, base_url)
     rows: list[PlayerRow] = []
 
-    try:
-        active_index = lines.index("Active")
-    except ValueError as exc:
-        raise RuntimeError("Could not find active roster section in source page.") from exc
+    pending_name: str | None = None
 
-    roster_lines = lines[active_index:]
-    search_start = 0
-
-    for index, name in enumerate(names, start=1):
-        try:
-            name_index = roster_lines.index(name, search_start)
-        except ValueError:
+    for line in lines:
+        clean = line.strip()
+        if not clean:
             continue
 
-        stat_line = ""
-        for candidate in roster_lines[name_index + 1:]:
-            if candidate in names:
-                break
-            if re.match(r"^(?:(\d+)\s+)?[A-Z/]+\s+\d+-\d+\s+\d+\s+\d+\s+\d+\s+.+$", candidate):
-                stat_line = candidate
-                break
-
-        search_start = name_index + 1
-
-        if not stat_line:
+        if clean in {"Active", "Player # Pos HT WT Age Exp College"}:
             continue
 
-        match = re.match(r"^(?:(\d+)\s+)?([A-Z/]+)\s+(\d+-\d+)\s+(\d+)\s+\d+\s+(\d+)\s+(.+)$", stat_line)
-        if not match:
-            continue
+        stat_match = re.match(r"^(?:(\d+)\s+)?([A-Z/]+)\s+(\d+-\d+)\s+(\d+)\s+\d+\s+(\d+)\s+(.+)$", clean)
 
-        position = match.group(2)
-        height_raw = match.group(3)
-        weight_raw = match.group(4)
-        experience = match.group(5)
-        profile_url = profiles.get(name, "")
-        image_url = ""
+        if stat_match and pending_name:
+            position = stat_match.group(2)
+            height_raw = stat_match.group(3)
+            weight_raw = stat_match.group(4)
+            experience = stat_match.group(5)
+            profile_url = profiles.get(pending_name, "")
+            image_url = ""
 
-        if profile_url:
-            try:
-                image_url = extract_player_image(fetch(profile_url, insecure=insecure), profile_url)
-            except Exception:
-                image_url = ""
+            if profile_url:
+                try:
+                    image_url = extract_player_image(fetch(profile_url, insecure=insecure), profile_url)
+                except Exception:
+                    image_url = ""
 
-        rows.append(
-            PlayerRow(
-                name=name,
-                position=position,
-                abbr=position,
-                experience=experience,
-                weight_kg=parse_weight_to_kg(weight_raw),
-                height_cm=parse_height_to_cm(height_raw),
-                image=image_url,
-                ordering=index * ordering_step,
+            rows.append(
+                PlayerRow(
+                    name=pending_name,
+                    position=position,
+                    abbr=position,
+                    experience=experience,
+                    weight_kg=parse_weight_to_kg(weight_raw),
+                    height_cm=parse_height_to_cm(height_raw),
+                    image=image_url,
+                    ordering=len(rows) * ordering_step + ordering_step,
+                )
             )
-        )
+            pending_name = None
+            continue
+
+        if re.match(r"^[A-Za-z0-9'.\- ]+$", clean) and not clean.startswith("Image:"):
+            pending_name = clean
 
     return rows
 
