@@ -86,14 +86,33 @@ def extract_active_names(html_source: str) -> list[str]:
 
 def extract_active_block_lines(html_source: str) -> list[str]:
     lines = extract_text_lines(html_source)
+    start_index: int | None = None
 
-    try:
-        start_index = lines.index("Active  Player # Pos HT WT Age Exp College") + 1
-    except ValueError:
-        try:
-            start_index = lines.index("#### Active") + 1
-        except ValueError as exc:
-            raise RuntimeError("Could not find active roster section in source page.") from exc
+    for index, line in enumerate(lines):
+        normalized = " ".join(line.split()).lower()
+        if "active" in normalized and "player" in normalized and "pos" in normalized:
+            start_index = index + 1
+            break
+
+    if start_index is None:
+        for index, line in enumerate(lines):
+            if line.strip().lower() != "active":
+                continue
+
+            window = " ".join(lines[index:index + 8]).lower()
+            if "player" in window or "pos" in window or re.search(r"[a-z'.\-]+\s+[a-z'.\-]+", window):
+                start_index = index + 1
+                break
+
+    if start_index is None:
+        for index, line in enumerate(lines):
+            normalized = line.strip().lower()
+            if normalized.startswith("player # pos ht wt age exp college") or normalized.startswith("player pos ht wt age exp college"):
+                start_index = index + 1
+                break
+
+    if start_index is None:
+        raise RuntimeError("Could not find active roster section in source page.")
 
     active_lines: list[str] = []
 
