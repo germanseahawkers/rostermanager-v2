@@ -152,10 +152,6 @@
       node.textContent = String(selectedForGroup(key).length);
     });
 
-    document.querySelectorAll("[data-review-count]").forEach((node) => {
-      const key = node.getAttribute("data-review-count");
-      node.textContent = String(selectedForGroup(key).length);
-    });
   }
 
   function updateShareLinks() {

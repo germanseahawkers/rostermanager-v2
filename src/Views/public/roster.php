@@ -93,29 +93,6 @@ ob_start();
             </div>
         </div>
 
-        <div class="card-panel review-panel">
-            <div class="panel-head">
-                <div>
-                    <div class="panel-kicker"><?= htmlspecialchars($t['review_title'], ENT_QUOTES, 'UTF-8') ?></div>
-                    <h2><?= htmlspecialchars($t['selected_roster'], ENT_QUOTES, 'UTF-8') ?></h2>
-                </div>
-                <div class="status-chip" data-roster-status><?= htmlspecialchars($simulator['complete'] ? $t['status_complete'] : $t['status_incomplete'], ENT_QUOTES, 'UTF-8') ?></div>
-            </div>
-            <p class="muted"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
-            <div class="review-grid">
-                <?php foreach ($simulator['sections'] as $section): ?>
-                    <article class="review-card">
-                        <h3><?= htmlspecialchars($section['label'], ENT_QUOTES, 'UTF-8') ?></h3>
-                        <?php foreach ($section['groups'] as $group): ?>
-                            <div class="review-row">
-                                <span><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?></span>
-                                <strong data-review-count="<?= htmlspecialchars($group['key'], ENT_QUOTES, 'UTF-8') ?>"><?= (int) $group['count_selected'] ?></strong>
-                            </div>
-                        <?php endforeach; ?>
-                    </article>
-                <?php endforeach; ?>
-            </div>
-        </div>
     </div>
 
     <aside class="sim-sidebar">
@@ -125,7 +102,10 @@ ob_start();
                     <div class="panel-kicker"><?= htmlspecialchars($t['selected_roster'], ENT_QUOTES, 'UTF-8') ?></div>
                     <h2 data-summary-total><?= (int) $simulator['selected_count'] ?>/<?= (int) $simulator['roster_limit'] ?></h2>
                 </div>
+                <div class="status-chip" data-roster-status><?= htmlspecialchars($simulator['complete'] ? $t['status_complete'] : $t['status_incomplete'], ENT_QUOTES, 'UTF-8') ?></div>
             </div>
+
+            <p class="muted"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
 
             <div class="metric-grid">
                 <div class="metric-box">
