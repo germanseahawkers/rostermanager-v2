@@ -1,0 +1,128 @@
+<?php
+
+$isEditing = !empty($player['id']);
+$formAction = $isEditing ? '/admin/players/update' : '/admin/players';
+
+ob_start();
+?>
+<section class="hero">
+    <div class="toolbar">
+        <div>
+            <h1>Admin: Players</h1>
+            <p class="muted">MVP scope: one protected admin area, player CRUD, CSV import and a clean path for later expansion.</p>
+        </div>
+        <form class="inline" method="post" action="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/logout">
+            <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+            <button class="secondary" type="submit">Log out</button>
+        </form>
+    </div>
+</section>
+
+<?php if (!empty($success)): ?>
+    <div class="notice success"><?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?></div>
+<?php endif; ?>
+
+<?php if (!empty($error)): ?>
+    <div class="notice error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+<?php endif; ?>
+
+<section class="split">
+    <div class="stack">
+        <div class="table-wrap card">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Abbr</th>
+                    <th>Experience</th>
+                    <th>Ordering</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($players as $item): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($item['position'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($item['abbr'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= htmlspecialchars($item['experience'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <td><?= (int) $item['ordering'] ?></td>
+                        <td>
+                            <a class="button secondary" href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players/edit?id=<?= (int) $item['id'] ?>">Edit</a>
+                            <form class="inline" method="post" action="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players/delete" onsubmit="return confirm('Delete this player?');">
+                                <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                                <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
+                                <button class="danger" type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="stack">
+        <form class="form-panel stack" method="post" action="<?= htmlspecialchars($config['app']['base_path'] . $formAction, ENT_QUOTES, 'UTF-8') ?>">
+            <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+            <h2><?= $isEditing ? 'Edit player' : 'New player' ?></h2>
+            <?php if ($isEditing): ?>
+                <input type="hidden" name="id" value="<?= (int) $player['id'] ?>">
+            <?php endif; ?>
+
+            <div class="field-grid">
+                <label>Name
+                    <input type="text" name="name" value="<?= htmlspecialchars((string) $player['name'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </label>
+                <label>Position
+                    <input type="text" name="position" value="<?= htmlspecialchars((string) $player['position'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </label>
+                <label>Abbr
+                    <input type="text" name="abbr" value="<?= htmlspecialchars((string) $player['abbr'], ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label>Experience
+                    <input type="text" name="experience" value="<?= htmlspecialchars((string) $player['experience'], ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label>Weight
+                    <input type="text" name="weight" value="<?= htmlspecialchars((string) $player['weight'], ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label>Height
+                    <input type="text" name="height" value="<?= htmlspecialchars((string) $player['height'], ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label>Image URL / Path
+                    <input type="text" name="image" value="<?= htmlspecialchars((string) $player['image'], ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label>Ordering
+                    <input type="number" name="ordering" value="<?= (int) $player['ordering'] ?>">
+                </label>
+            </div>
+
+            <div class="actions">
+                <button type="submit"><?= $isEditing ? 'Save changes' : 'Create player' ?></button>
+                <?php if ($isEditing): ?>
+                    <a class="button secondary" href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players">Cancel</a>
+                <?php endif; ?>
+            </div>
+        </form>
+
+        <form class="form-panel stack" method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players/import">
+            <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+            <h2>CSV import</h2>
+            <p class="hint">Expected header: <code>name,position,abbr,experience,weight,height,image,ordering</code></p>
+            <label>
+                CSV file
+                <input type="file" name="csv" accept=".csv,text/csv" required>
+            </label>
+            <button type="submit">Import players</button>
+        </form>
+    </div>
+</section>
+<?php
+$content = (string) ob_get_clean();
+
+echo App\Core\View::make('layouts/app', [
+    'config' => $config,
+    'title' => 'Admin: Players',
+    'content' => $content,
+]);
