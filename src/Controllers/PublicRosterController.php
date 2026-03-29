@@ -23,7 +23,7 @@ final class PublicRosterController
         $locale = resolve_locale($request->query('lang', 'en'));
         $translations = translations($locale);
         $author = normalize_share_author($request->query('author', ''));
-        $palette = resolve_share_palette((string) $request->query('scheme', 'navy'), $this->config, $locale);
+        $palette = resolve_share_palette((string) $request->query('scheme', 'primary'), $this->config, $locale);
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
         $simulator = build_simulator_payload(
@@ -52,7 +52,7 @@ final class PublicRosterController
         $locale = resolve_locale($request->query('lang', 'en'));
         $translations = translations($locale);
         $author = normalize_share_author($request->query('author', ''));
-        $palette = resolve_share_palette((string) $request->query('scheme', 'navy'), $this->config, $locale);
+        $palette = resolve_share_palette((string) $request->query('scheme', 'primary'), $this->config, $locale);
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
         $simulator = build_simulator_payload(
@@ -81,7 +81,7 @@ final class PublicRosterController
     {
         $locale = resolve_locale($request->query('lang', 'en'));
         $author = normalize_share_author($request->query('author', ''));
-        $palette = resolve_share_palette((string) $request->query('scheme', 'navy'), $this->config, $locale);
+        $palette = resolve_share_palette((string) $request->query('scheme', 'primary'), $this->config, $locale);
         $repository = new PlayerRepository($this->database->pdo());
         $selectedIds = parse_roster_selection((string) $request->query('roster', ''));
         $simulator = build_simulator_payload(

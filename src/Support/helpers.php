@@ -120,10 +120,9 @@ function translations(string $locale): array
             'personalize_name_label' => 'Dein Name',
             'personalize_name_placeholder' => 'Zum Beispiel Simon',
             'personalize_palette_label' => 'Farbschema',
-            'palette_navy' => 'Marineblau',
-            'palette_lime' => 'Neongrün',
-            'palette_gray' => 'Wolfsgrau',
-            'palette_white' => 'Weiß',
+            'palette_primary' => 'Primär',
+            'palette_secondary' => 'Sekundär',
+            'palette_neutral' => 'Neutral',
             'group_offense' => 'Offense',
             'group_defense' => 'Defense',
             'group_special_teams' => 'Special Teams',
@@ -177,10 +176,9 @@ function translations(string $locale): array
             'personalize_name_label' => 'Your name',
             'personalize_name_placeholder' => 'For example, Simon',
             'personalize_palette_label' => 'Color scheme',
-            'palette_navy' => 'Navy',
-            'palette_lime' => 'Lime',
-            'palette_gray' => 'Wolf gray',
-            'palette_white' => 'White',
+            'palette_primary' => 'Primary',
+            'palette_secondary' => 'Secondary',
+            'palette_neutral' => 'Neutral',
             'group_offense' => 'Offense',
             'group_defense' => 'Defense',
             'group_special_teams' => 'Special Teams',
@@ -234,10 +232,9 @@ function translations(string $locale): array
             'personalize_name_label' => 'Tu nombre',
             'personalize_name_placeholder' => 'Por ejemplo, Simon',
             'personalize_palette_label' => 'Esquema de color',
-            'palette_navy' => 'Azul marino',
-            'palette_lime' => 'Verde neón',
-            'palette_gray' => 'Gris lobo',
-            'palette_white' => 'Blanco',
+            'palette_primary' => 'Primario',
+            'palette_secondary' => 'Secundario',
+            'palette_neutral' => 'Neutro',
             'group_offense' => 'Ataque',
             'group_defense' => 'Defensa',
             'group_special_teams' => 'Equipos especiales',
@@ -291,10 +288,9 @@ function translations(string $locale): array
             'personalize_name_label' => 'Ton nom',
             'personalize_name_placeholder' => 'Par exemple, Simon',
             'personalize_palette_label' => 'Palette de couleurs',
-            'palette_navy' => 'Bleu marine',
-            'palette_lime' => 'Vert néon',
-            'palette_gray' => 'Gris loup',
-            'palette_white' => 'Blanc',
+            'palette_primary' => 'Primaire',
+            'palette_secondary' => 'Secondaire',
+            'palette_neutral' => 'Neutre',
             'group_offense' => 'Attaque',
             'group_defense' => 'Défense',
             'group_special_teams' => 'Équipes spéciales',
@@ -348,10 +344,9 @@ function translations(string $locale): array
             'personalize_name_label' => 'Seu nome',
             'personalize_name_placeholder' => 'Por exemplo, Simon',
             'personalize_palette_label' => 'Paleta de cores',
-            'palette_navy' => 'Azul-marinho',
-            'palette_lime' => 'Verde neon',
-            'palette_gray' => 'Cinza lobo',
-            'palette_white' => 'Branco',
+            'palette_primary' => 'Primária',
+            'palette_secondary' => 'Secundária',
+            'palette_neutral' => 'Neutra',
             'group_offense' => 'Ataque',
             'group_defense' => 'Defesa',
             'group_special_teams' => 'Times especiais',
@@ -377,62 +372,56 @@ function share_palette_options(array $config, string $locale): array
 {
     $teamColors = $config['team']['colors'] ?? [];
     $t = translations($locale);
+    $primary = (string) ($teamColors['primary'] ?? '#0b2545');
+    $secondary = (string) ($teamColors['secondary'] ?? '#7ac143');
+    $surface = (string) ($teamColors['surface'] ?? '#eef3f8');
+    $surfaceAlt = (string) ($teamColors['surface_alt'] ?? '#d7e4f0');
+    $text = (string) ($teamColors['text'] ?? '#f7fbff');
+    $ink = (string) ($teamColors['ink'] ?? '#142033');
+    $muted = (string) ($teamColors['muted'] ?? '#60708a');
+    $line = (string) ($teamColors['line'] ?? '#b5c5d6');
 
     return [
-        'navy' => [
-            'key' => 'navy',
-            'label' => $t['palette_navy'] ?? 'Navy',
+        'primary' => [
+            'key' => 'primary',
+            'label' => $t['palette_primary'] ?? 'Primary',
             'colors' => [
-                'primary' => $teamColors['primary'] ?? '#0b2545',
-                'secondary' => $teamColors['secondary'] ?? '#7ac143',
-                'surface' => '#102b4b',
-                'surface_alt' => $teamColors['surface_alt'] ?? '#d7e4f0',
-                'text' => '#f7fbff',
-                'ink' => '#f7fbff',
-                'muted' => 'rgba(247, 251, 255, 0.78)',
-                'line' => 'rgba(215, 228, 240, 0.28)',
+                'primary' => $primary,
+                'secondary' => $secondary,
+                'surface' => $surface,
+                'surface_alt' => $surfaceAlt,
+                'text' => $text,
+                'ink' => $ink,
+                'muted' => $muted,
+                'line' => $line,
             ],
         ],
-        'lime' => [
-            'key' => 'lime',
-            'label' => $t['palette_lime'] ?? 'Lime',
+        'secondary' => [
+            'key' => 'secondary',
+            'label' => $t['palette_secondary'] ?? 'Secondary',
             'colors' => [
-                'primary' => '#7ac143',
-                'secondary' => $teamColors['primary'] ?? '#0b2545',
-                'surface' => '#f7fbff',
-                'surface_alt' => '#dff0c5',
-                'text' => '#142033',
-                'ink' => '#142033',
-                'muted' => '#47606f',
-                'line' => '#bfd7aa',
+                'primary' => $secondary,
+                'secondary' => $primary,
+                'surface' => $surface,
+                'surface_alt' => $surfaceAlt,
+                'text' => $ink,
+                'ink' => $ink,
+                'muted' => $muted,
+                'line' => $line,
             ],
         ],
-        'gray' => [
-            'key' => 'gray',
-            'label' => $t['palette_gray'] ?? 'Gray',
+        'neutral' => [
+            'key' => 'neutral',
+            'label' => $t['palette_neutral'] ?? 'Neutral',
             'colors' => [
-                'primary' => '#b8c0c8',
-                'secondary' => $teamColors['primary'] ?? '#0b2545',
-                'surface' => '#f7fbff',
-                'surface_alt' => '#e6ebf0',
-                'text' => '#142033',
-                'ink' => '#142033',
-                'muted' => '#60708a',
-                'line' => '#c6cfd7',
-            ],
-        ],
-        'white' => [
-            'key' => 'white',
-            'label' => $t['palette_white'] ?? 'White',
-            'colors' => [
-                'primary' => '#ffffff',
-                'secondary' => $teamColors['primary'] ?? '#0b2545',
-                'surface' => '#ffffff',
-                'surface_alt' => '#eef3f8',
-                'text' => '#142033',
-                'ink' => '#142033',
-                'muted' => '#60708a',
-                'line' => '#d7e1eb',
+                'primary' => $surfaceAlt,
+                'secondary' => $primary,
+                'surface' => $surface,
+                'surface_alt' => $surfaceAlt,
+                'text' => $ink,
+                'ink' => $ink,
+                'muted' => $muted,
+                'line' => $line,
             ],
         ],
     ];
@@ -441,7 +430,14 @@ function share_palette_options(array $config, string $locale): array
 function resolve_share_palette(string $scheme, array $config, string $locale): array
 {
     $palettes = share_palette_options($config, $locale);
-    $paletteKey = array_key_exists($scheme, $palettes) ? $scheme : 'navy';
+    $aliases = [
+        'navy' => 'primary',
+        'lime' => 'secondary',
+        'gray' => 'neutral',
+        'white' => 'neutral',
+    ];
+    $normalizedScheme = $aliases[$scheme] ?? $scheme;
+    $paletteKey = array_key_exists($normalizedScheme, $palettes) ? $normalizedScheme : 'primary';
     $palette = $palettes[$paletteKey];
     $palette['key'] = $paletteKey;
 

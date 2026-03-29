@@ -9,7 +9,7 @@ $clubUrl = trim((string) ($club['url'] ?? ''));
 $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
 $author = $author ?? '';
 $paletteOptions = $paletteOptions ?? [];
-$palette = $palette ?? resolve_share_palette('navy', $config, $locale);
+$palette = $palette ?? resolve_share_palette('primary', $config, $locale);
 $personalizedTitle = personalized_roster_title($t, $author);
 
 $simulatorConfig = [

@@ -7,7 +7,7 @@ $clubTagline = trim((string) ($club['tagline'] ?? ''));
 $clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
 $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
 $author = $author ?? '';
-$palette = $palette ?? resolve_share_palette('navy', $config, $locale);
+$palette = $palette ?? resolve_share_palette('primary', $config, $locale);
 $personalizedTitle = personalized_roster_title($t, $author);
 
 ob_start();

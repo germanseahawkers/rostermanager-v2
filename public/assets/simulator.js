@@ -42,7 +42,7 @@
   const tabButtons = root.querySelectorAll("[data-group-tab]");
   const userLocale = (navigator.language || state.locale || "en").toLowerCase();
   const usesImperial = userLocale.includes("-us") || userLocale === "en-us";
-  state.personalization = state.personalization || { author: "", scheme: "navy", palettes: {} };
+  state.personalization = state.personalization || { author: "", scheme: "primary", palettes: {} };
 
   function selectedIdsArray() {
     return Array.from(selectedIds).sort((a, b) => a - b);
@@ -273,7 +273,7 @@
 
   paletteButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      state.personalization.scheme = button.dataset.paletteScheme || "navy";
+      state.personalization.scheme = button.dataset.paletteScheme || "primary";
       updatePersonalization();
       updateUrlState();
       updateShareLinks();
