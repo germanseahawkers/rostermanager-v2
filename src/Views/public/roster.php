@@ -7,6 +7,10 @@ $clubTagline = trim((string) ($club['tagline'] ?? ''));
 $clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
 $clubUrl = trim((string) ($club['url'] ?? ''));
 $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
+$author = $author ?? '';
+$paletteOptions = $paletteOptions ?? [];
+$palette = $palette ?? resolve_share_palette('navy', $config, $locale);
+$personalizedTitle = personalized_roster_title($t, $author);
 
 $simulatorConfig = [
     'players' => $simulator['players'],
@@ -26,6 +30,13 @@ $simulatorConfig = [
         'experienceRookie' => $t['experience_rookie'],
         'experienceYearSingular' => $t['experience_year_singular'],
         'experienceYearPlural' => $t['experience_year_plural'],
+        'selectedRoster' => $t['selected_roster'],
+        'selectedRosterNamed' => $t['selected_roster_named'],
+    ],
+    'personalization' => [
+        'author' => $author,
+        'scheme' => $palette['key'],
+        'palettes' => $paletteOptions,
     ],
 ];
 
@@ -129,16 +140,50 @@ ob_start();
             </div>
         </div>
 
-        <div class="card-panel review-panel">
+        <div class="card-panel review-panel personalized-panel" data-personalized-panel style="<?= htmlspecialchars(share_palette_style($palette), ENT_QUOTES, 'UTF-8') ?>">
+            <div class="personalize-grid">
+                <label class="personalize-field">
+                    <span class="personalize-label"><?= htmlspecialchars($t['personalize_name_label'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <input
+                        type="text"
+                        value="<?= htmlspecialchars($author, ENT_QUOTES, 'UTF-8') ?>"
+                        maxlength="40"
+                        placeholder="<?= htmlspecialchars($t['personalize_name_placeholder'], ENT_QUOTES, 'UTF-8') ?>"
+                        data-author-input
+                    >
+                </label>
+                <div class="personalize-field">
+                    <span class="personalize-label"><?= htmlspecialchars($t['personalize_palette_label'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <div class="palette-picker">
+                        <?php foreach ($paletteOptions as $paletteOption): ?>
+                            <?php $swatch = $paletteOption['colors']['primary'] ?? '#0b2545'; ?>
+                            <button
+                                type="button"
+                                class="palette-button<?= $paletteOption['key'] === $palette['key'] ? ' active' : '' ?>"
+                                data-palette-scheme="<?= htmlspecialchars($paletteOption['key'], ENT_QUOTES, 'UTF-8') ?>"
+                                title="<?= htmlspecialchars($paletteOption['label'], ENT_QUOTES, 'UTF-8') ?>"
+                                aria-label="<?= htmlspecialchars($paletteOption['label'], ENT_QUOTES, 'UTF-8') ?>"
+                            >
+                                <span class="palette-swatch" style="background: <?= htmlspecialchars($swatch, ENT_QUOTES, 'UTF-8') ?>"></span>
+                                <span><?= htmlspecialchars($paletteOption['label'], ENT_QUOTES, 'UTF-8') ?></span>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
             <div class="panel-head">
                 <div>
                     <div class="panel-kicker"><?= htmlspecialchars($t['review_title'], ENT_QUOTES, 'UTF-8') ?></div>
-                    <h2 data-summary-total><?= (int) $simulator['selected_count'] ?>/<?= (int) $simulator['roster_limit'] ?></h2>
+                    <h2 data-personalized-title><?= htmlspecialchars($personalizedTitle, ENT_QUOTES, 'UTF-8') ?></h2>
                 </div>
-                <div class="status-chip" data-roster-status><?= htmlspecialchars($simulator['complete'] ? $t['status_complete'] : $t['status_incomplete'], ENT_QUOTES, 'UTF-8') ?></div>
+                <div class="review-head-meta">
+                    <div class="panel-count" data-summary-total><?= (int) $simulator['selected_count'] ?>/<?= (int) $simulator['roster_limit'] ?></div>
+                    <div class="status-chip" data-roster-status><?= htmlspecialchars($simulator['complete'] ? $t['status_complete'] : $t['status_incomplete'], ENT_QUOTES, 'UTF-8') ?></div>
+                </div>
             </div>
 
-            <p class="muted"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
+            <p class="muted"><?= htmlspecialchars($t['personalize_body'], ENT_QUOTES, 'UTF-8') ?></p>
 
             <div class="metric-grid">
                 <div class="metric-box">

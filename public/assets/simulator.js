@@ -35,9 +35,14 @@
   const nativeShareButton = root.querySelector("[data-native-share]");
   const copyLinkButton = root.querySelector("[data-copy-link]");
   const copyFeedback = root.querySelector("[data-copy-feedback]");
+  const personalizedPanel = root.querySelector("[data-personalized-panel]");
+  const personalizedTitle = root.querySelector("[data-personalized-title]");
+  const authorInput = root.querySelector("[data-author-input]");
+  const paletteButtons = root.querySelectorAll("[data-palette-scheme]");
   const tabButtons = root.querySelectorAll("[data-group-tab]");
   const userLocale = (navigator.language || state.locale || "en").toLowerCase();
   const usesImperial = userLocale.includes("-us") || userLocale === "en-us";
+  state.personalization = state.personalization || { author: "", scheme: "navy", palettes: {} };
 
   function selectedIdsArray() {
     return Array.from(selectedIds).sort((a, b) => a - b);
@@ -76,7 +81,45 @@
     if (roster) url.searchParams.set("roster", roster);
     else url.searchParams.delete("roster");
 
+    if (state.personalization.author) url.searchParams.set("author", state.personalization.author);
+    else url.searchParams.delete("author");
+
+    if (state.personalization.scheme) url.searchParams.set("scheme", state.personalization.scheme);
+    else url.searchParams.delete("scheme");
+
     window.history.replaceState({}, "", url.toString());
+  }
+
+  function formatPersonalizedTitle() {
+    const author = String(state.personalization.author || "").trim();
+    if (!author) return state.labels.selectedRoster || "Your 53-man roster";
+
+    const template = state.labels.selectedRosterNamed || "%s's 53-man roster";
+    return template.replace("%s", author);
+  }
+
+  function applyPalette() {
+    const palette = state.personalization.palettes?.[state.personalization.scheme];
+    if (!personalizedPanel || !palette?.colors) return;
+
+    const colors = palette.colors;
+    personalizedPanel.style.setProperty("--preview-primary", colors.primary || "#0b2545");
+    personalizedPanel.style.setProperty("--preview-secondary", colors.secondary || "#7ac143");
+    personalizedPanel.style.setProperty("--preview-surface", colors.surface || "#ffffff");
+    personalizedPanel.style.setProperty("--preview-surface-alt", colors.surface_alt || "#d7e4f0");
+    personalizedPanel.style.setProperty("--preview-text", colors.text || "#f7fbff");
+    personalizedPanel.style.setProperty("--preview-ink", colors.ink || "#142033");
+    personalizedPanel.style.setProperty("--preview-muted", colors.muted || "#60708a");
+    personalizedPanel.style.setProperty("--preview-line", colors.line || "#b5c5d6");
+
+    paletteButtons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.paletteScheme === state.personalization.scheme);
+    });
+  }
+
+  function updatePersonalization() {
+    if (personalizedTitle) personalizedTitle.textContent = formatPersonalizedTitle();
+    applyPalette();
   }
 
   function renderPlayer(player, selected, buttonLabel) {
@@ -159,6 +202,14 @@
     const cardUrl = new URL(`${state.basePath}/share/card.svg`, window.location.origin);
     cardUrl.searchParams.set("lang", state.locale);
     cardUrl.searchParams.set("roster", selectedIdsArray().join(","));
+    if (state.personalization.author) {
+      shareUrl.searchParams.set("author", state.personalization.author);
+      cardUrl.searchParams.set("author", state.personalization.author);
+    }
+    if (state.personalization.scheme) {
+      shareUrl.searchParams.set("scheme", state.personalization.scheme);
+      cardUrl.searchParams.set("scheme", state.personalization.scheme);
+    }
 
     const whatsappUrl = new URL("https://wa.me/");
     whatsappUrl.searchParams.set("text", `${state.labels.shareCaption}: ${shareUrl.toString()}`);
@@ -213,6 +264,22 @@
     });
   });
 
+  authorInput?.addEventListener("input", () => {
+    state.personalization.author = authorInput.value.trim().slice(0, 40);
+    updatePersonalization();
+    updateUrlState();
+    updateShareLinks();
+  });
+
+  paletteButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.personalization.scheme = button.dataset.paletteScheme || "navy";
+      updatePersonalization();
+      updateUrlState();
+      updateShareLinks();
+    });
+  });
+
   copyLinkButton?.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(shareUrlInput.value);
@@ -239,6 +306,7 @@
   });
 
   updateCounts();
+  updatePersonalization();
   updateShareLinks();
   renderGroup();
 })();

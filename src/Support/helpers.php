@@ -23,6 +23,17 @@ function resolve_locale(mixed $value, string $default = 'en'): string
     return array_key_exists($locale, $supported) ? $locale : $default;
 }
 
+function normalize_share_author(mixed $value): string
+{
+    $author = is_string($value) ? trim(preg_replace('/\s+/', ' ', $value) ?? '') : '';
+
+    if ($author === '') {
+        return '';
+    }
+
+    return function_exists('mb_substr') ? mb_substr($author, 0, 40) : substr($author, 0, 40);
+}
+
 function config_value(array $config, string $key, mixed $default = null): mixed
 {
     $segments = explode('.', $key);
@@ -81,6 +92,7 @@ function translations(string $locale): array
             'share_native' => 'Teilen',
             'available_label' => 'Verfügbare Spieler',
             'selected_roster' => 'Dein 53er-Roster',
+            'selected_roster_named' => '53er-Roster von %s',
             'empty_state' => 'Für diese Positionsgruppe gibt es aktuell keine Spieler.',
             'experience' => 'Erfahrung',
             'height' => 'Größe',
@@ -103,6 +115,15 @@ function translations(string $locale): array
             'experience_year_plural' => 'Jahre',
             'club_presented_by' => 'Ein Angebot des',
             'club_developed_by' => 'Entwickelt für den',
+            'personalize_title' => 'Personalisiere deine Vorhersage',
+            'personalize_body' => 'Gib deinem 53er-Roster einen eigenen Namen und wähle ein Farbschema für Share-Seite und Grafik.',
+            'personalize_name_label' => 'Dein Name',
+            'personalize_name_placeholder' => 'Zum Beispiel Simon',
+            'personalize_palette_label' => 'Farbschema',
+            'palette_navy' => 'Marineblau',
+            'palette_lime' => 'Neongrün',
+            'palette_gray' => 'Wolfsgrau',
+            'palette_white' => 'Weiß',
             'group_offense' => 'Offense',
             'group_defense' => 'Defense',
             'group_special_teams' => 'Special Teams',
@@ -128,6 +149,7 @@ function translations(string $locale): array
             'share_native' => 'Share',
             'available_label' => 'Available players',
             'selected_roster' => 'Your 53-man roster',
+            'selected_roster_named' => '%s\'s 53-man roster',
             'empty_state' => 'No players are available for this position group yet.',
             'experience' => 'Experience',
             'height' => 'Height',
@@ -150,6 +172,15 @@ function translations(string $locale): array
             'experience_year_plural' => 'years',
             'club_presented_by' => 'Presented by',
             'club_developed_by' => 'Built for',
+            'personalize_title' => 'Personalize your prediction',
+            'personalize_body' => 'Give your final roster your own name and choose a color scheme for the share page and graphic.',
+            'personalize_name_label' => 'Your name',
+            'personalize_name_placeholder' => 'For example, Simon',
+            'personalize_palette_label' => 'Color scheme',
+            'palette_navy' => 'Navy',
+            'palette_lime' => 'Lime',
+            'palette_gray' => 'Wolf gray',
+            'palette_white' => 'White',
             'group_offense' => 'Offense',
             'group_defense' => 'Defense',
             'group_special_teams' => 'Special Teams',
@@ -175,6 +206,7 @@ function translations(string $locale): array
             'share_native' => 'Compartir',
             'available_label' => 'Jugadores disponibles',
             'selected_roster' => 'Tu roster de 53',
+            'selected_roster_named' => 'Roster de 53 de %s',
             'empty_state' => 'Actualmente no hay jugadores para este grupo de posiciones.',
             'experience' => 'Experiencia',
             'height' => 'Altura',
@@ -197,6 +229,15 @@ function translations(string $locale): array
             'experience_year_plural' => 'años',
             'club_presented_by' => 'Presentado por',
             'club_developed_by' => 'Desarrollado para',
+            'personalize_title' => 'Personaliza tu predicción',
+            'personalize_body' => 'Dale tu propio nombre a tu roster final y elige un esquema de color para la página y la imagen compartida.',
+            'personalize_name_label' => 'Tu nombre',
+            'personalize_name_placeholder' => 'Por ejemplo, Simon',
+            'personalize_palette_label' => 'Esquema de color',
+            'palette_navy' => 'Azul marino',
+            'palette_lime' => 'Verde neón',
+            'palette_gray' => 'Gris lobo',
+            'palette_white' => 'Blanco',
             'group_offense' => 'Ataque',
             'group_defense' => 'Defensa',
             'group_special_teams' => 'Equipos especiales',
@@ -222,6 +263,7 @@ function translations(string $locale): array
             'share_native' => 'Partager',
             'available_label' => 'Joueurs disponibles',
             'selected_roster' => 'Ton effectif de 53',
+            'selected_roster_named' => 'Effectif de 53 de %s',
             'empty_state' => 'Aucun joueur n’est actuellement disponible pour ce groupe de positions.',
             'experience' => 'Expérience',
             'height' => 'Taille',
@@ -244,6 +286,15 @@ function translations(string $locale): array
             'experience_year_plural' => 'ans',
             'club_presented_by' => 'Proposé par',
             'club_developed_by' => 'Conçu pour',
+            'personalize_title' => 'Personnalise ta prédiction',
+            'personalize_body' => 'Donne un nom à ton effectif final et choisis un schéma de couleurs pour la page et le visuel de partage.',
+            'personalize_name_label' => 'Ton nom',
+            'personalize_name_placeholder' => 'Par exemple, Simon',
+            'personalize_palette_label' => 'Palette de couleurs',
+            'palette_navy' => 'Bleu marine',
+            'palette_lime' => 'Vert néon',
+            'palette_gray' => 'Gris loup',
+            'palette_white' => 'Blanc',
             'group_offense' => 'Attaque',
             'group_defense' => 'Défense',
             'group_special_teams' => 'Équipes spéciales',
@@ -269,6 +320,7 @@ function translations(string $locale): array
             'share_native' => 'Compartilhar',
             'available_label' => 'Jogadores disponíveis',
             'selected_roster' => 'Seu elenco de 53',
+            'selected_roster_named' => 'Elenco de 53 de %s',
             'empty_state' => 'No momento não há jogadores disponíveis para este grupo de posições.',
             'experience' => 'Experiência',
             'height' => 'Altura',
@@ -291,6 +343,15 @@ function translations(string $locale): array
             'experience_year_plural' => 'anos',
             'club_presented_by' => 'Apresentado por',
             'club_developed_by' => 'Desenvolvido para',
+            'personalize_title' => 'Personalize sua previsão',
+            'personalize_body' => 'Dê um nome ao seu elenco final e escolha uma paleta de cores para a página e a arte de compartilhamento.',
+            'personalize_name_label' => 'Seu nome',
+            'personalize_name_placeholder' => 'Por exemplo, Simon',
+            'personalize_palette_label' => 'Paleta de cores',
+            'palette_navy' => 'Azul-marinho',
+            'palette_lime' => 'Verde neon',
+            'palette_gray' => 'Cinza lobo',
+            'palette_white' => 'Branco',
             'group_offense' => 'Ataque',
             'group_defense' => 'Defesa',
             'group_special_teams' => 'Times especiais',
@@ -299,6 +360,108 @@ function translations(string $locale): array
     ];
 
     return $messages[$locale] ?? $messages['de'];
+}
+
+function personalized_roster_title(array $translations, string $author): string
+{
+    if ($author === '') {
+        return (string) ($translations['selected_roster'] ?? 'Your 53-man roster');
+    }
+
+    $template = (string) ($translations['selected_roster_named'] ?? '%s\'s 53-man roster');
+
+    return str_replace('%s', $author, $template);
+}
+
+function share_palette_options(array $config, string $locale): array
+{
+    $teamColors = $config['team']['colors'] ?? [];
+    $t = translations($locale);
+
+    return [
+        'navy' => [
+            'key' => 'navy',
+            'label' => $t['palette_navy'] ?? 'Navy',
+            'colors' => [
+                'primary' => $teamColors['primary'] ?? '#0b2545',
+                'secondary' => $teamColors['secondary'] ?? '#7ac143',
+                'surface' => '#102b4b',
+                'surface_alt' => $teamColors['surface_alt'] ?? '#d7e4f0',
+                'text' => '#f7fbff',
+                'ink' => '#f7fbff',
+                'muted' => 'rgba(247, 251, 255, 0.78)',
+                'line' => 'rgba(215, 228, 240, 0.28)',
+            ],
+        ],
+        'lime' => [
+            'key' => 'lime',
+            'label' => $t['palette_lime'] ?? 'Lime',
+            'colors' => [
+                'primary' => '#7ac143',
+                'secondary' => $teamColors['primary'] ?? '#0b2545',
+                'surface' => '#f7fbff',
+                'surface_alt' => '#dff0c5',
+                'text' => '#142033',
+                'ink' => '#142033',
+                'muted' => '#47606f',
+                'line' => '#bfd7aa',
+            ],
+        ],
+        'gray' => [
+            'key' => 'gray',
+            'label' => $t['palette_gray'] ?? 'Gray',
+            'colors' => [
+                'primary' => '#b8c0c8',
+                'secondary' => $teamColors['primary'] ?? '#0b2545',
+                'surface' => '#f7fbff',
+                'surface_alt' => '#e6ebf0',
+                'text' => '#142033',
+                'ink' => '#142033',
+                'muted' => '#60708a',
+                'line' => '#c6cfd7',
+            ],
+        ],
+        'white' => [
+            'key' => 'white',
+            'label' => $t['palette_white'] ?? 'White',
+            'colors' => [
+                'primary' => '#ffffff',
+                'secondary' => $teamColors['primary'] ?? '#0b2545',
+                'surface' => '#ffffff',
+                'surface_alt' => '#eef3f8',
+                'text' => '#142033',
+                'ink' => '#142033',
+                'muted' => '#60708a',
+                'line' => '#d7e1eb',
+            ],
+        ],
+    ];
+}
+
+function resolve_share_palette(string $scheme, array $config, string $locale): array
+{
+    $palettes = share_palette_options($config, $locale);
+    $paletteKey = array_key_exists($scheme, $palettes) ? $scheme : 'navy';
+    $palette = $palettes[$paletteKey];
+    $palette['key'] = $paletteKey;
+
+    return $palette;
+}
+
+function share_palette_style(array $palette): string
+{
+    $colors = $palette['colors'] ?? [];
+
+    return implode('; ', [
+        '--preview-primary: ' . ($colors['primary'] ?? '#0b2545'),
+        '--preview-secondary: ' . ($colors['secondary'] ?? '#7ac143'),
+        '--preview-surface: ' . ($colors['surface'] ?? '#ffffff'),
+        '--preview-surface-alt: ' . ($colors['surface_alt'] ?? '#d7e4f0'),
+        '--preview-text: ' . ($colors['text'] ?? '#f7fbff'),
+        '--preview-ink: ' . ($colors['ink'] ?? '#142033'),
+        '--preview-muted: ' . ($colors['muted'] ?? '#60708a'),
+        '--preview-line: ' . ($colors['line'] ?? '#b5c5d6'),
+    ]);
 }
 
 function parse_roster_selection(string $rosterValue): array
@@ -424,13 +587,13 @@ function build_simulator_payload(array $players, array $groups, string $locale, 
     ];
 }
 
-function render_share_card_svg(array $simulator, array $config, string $locale): string
+function render_share_card_svg(array $simulator, array $config, string $locale, string $author = '', ?array $palette = null): string
 {
     $team = $config['team'];
     $club = $config['club'] ?? [];
-    $colors = $team['colors'];
+    $colors = ($palette['colors'] ?? null) ?: $team['colors'];
     $t = translations($locale);
-    $title = svg_escape($team['name'] . ' 53-Man');
+    $title = svg_escape(personalized_roster_title($t, $author));
     $subtitle = svg_escape($t['share_card_subtitle'] . ' · ' . count($simulator['selected_ids']) . '/' . $simulator['roster_limit']);
     $clubName = trim((string) ($club['name'] ?? ''));
     $clubLine = $clubName !== '' ? trim(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName) : '';
@@ -446,7 +609,7 @@ function render_share_card_svg(array $simulator, array $config, string $locale):
             $line = $group['label'] . ': ' . ($names === [] ? '—' : implode(', ', $names));
 
             foreach (svg_wrap_lines($line, 82) as $wrappedLine) {
-                $rows[] = '<text x="80" y="' . $y . '" font-size="18" fill="' . $colors['text'] . '">' . svg_escape($wrappedLine) . '</text>';
+                $rows[] = '<text x="80" y="' . $y . '" font-size="18" fill="' . $colors['ink'] . '">' . svg_escape($wrappedLine) . '</text>';
                 $y += 28;
             }
 
@@ -457,17 +620,17 @@ function render_share_card_svg(array $simulator, array $config, string $locale):
     }
 
     if ($clubLine !== '') {
-        $rows[] = '<text x="80" y="1050" font-size="18" fill="' . $colors['surface_alt'] . '">' . svg_escape($clubLine) . '</text>';
+        $rows[] = '<text x="80" y="1050" font-size="18" fill="' . $colors['muted'] . '">' . svg_escape($clubLine) . '</text>';
     }
-    $rows[] = '<text x="80" y="1080" font-size="20" fill="' . $colors['surface_alt'] . '">' . svg_escape($team['tagline']) . '</text>';
+    $rows[] = '<text x="80" y="1080" font-size="20" fill="' . $colors['muted'] . '">' . svg_escape($team['tagline']) . '</text>';
 
     return '<?xml version="1.0" encoding="UTF-8"?>'
         . '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="' . $title . '">'
         . '<rect width="1200" height="1200" fill="' . $colors['primary'] . '"/>'
-        . '<rect x="60" y="60" width="1080" height="1080" rx="32" fill="rgba(255,255,255,0.05)" stroke="' . $colors['surface_alt'] . '" stroke-width="2"/>'
+        . '<rect x="60" y="60" width="1080" height="1080" rx="32" fill="' . $colors['surface'] . '" stroke="' . $colors['line'] . '" stroke-width="2"/>'
         . '<text x="80" y="120" font-size="28" fill="' . $colors['secondary'] . '" font-weight="700">' . svg_escape(strtoupper($team['city'])) . '</text>'
-        . '<text x="80" y="175" font-size="52" fill="' . $colors['text'] . '" font-weight="800">' . $title . '</text>'
-        . '<text x="80" y="210" font-size="24" fill="' . $colors['surface_alt'] . '">' . $subtitle . '</text>'
+        . '<text x="80" y="175" font-size="52" fill="' . $colors['ink'] . '" font-weight="800">' . $title . '</text>'
+        . '<text x="80" y="210" font-size="24" fill="' . $colors['muted'] . '">' . $subtitle . '</text>'
         . implode('', $rows)
         . '</svg>';
 }

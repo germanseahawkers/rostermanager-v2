@@ -6,13 +6,16 @@ $clubName = trim((string) ($club['name'] ?? ''));
 $clubTagline = trim((string) ($club['tagline'] ?? ''));
 $clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
 $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
+$author = $author ?? '';
+$palette = $palette ?? resolve_share_palette('navy', $config, $locale);
+$personalizedTitle = personalized_roster_title($t, $author);
 
 ob_start();
 ?>
 <section class="sim-hero compact">
     <div class="sim-hero-copy">
         <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['city']), ENT_QUOTES, 'UTF-8') ?></div>
-        <h1><?= htmlspecialchars($team['name'] . ' ' . $t['share_page_title'], ENT_QUOTES, 'UTF-8') ?></h1>
+        <h1><?= htmlspecialchars($personalizedTitle, ENT_QUOTES, 'UTF-8') ?></h1>
         <p class="lead"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
         <?php if ($clubName !== ''): ?>
             <div class="club-note">
@@ -46,7 +49,7 @@ ob_start();
     </div>
 </section>
 
-<section class="review-grid share-review-grid">
+<section class="review-grid share-review-grid personalized-panel" style="<?= htmlspecialchars(share_palette_style($palette), ENT_QUOTES, 'UTF-8') ?>">
     <?php foreach ($simulator['sections'] as $section): ?>
         <article class="review-card">
             <h2><?= htmlspecialchars($section['label'], ENT_QUOTES, 'UTF-8') ?></h2>
