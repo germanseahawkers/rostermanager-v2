@@ -90,8 +90,8 @@ a { color: inherit; }
 }
 
 .card-panel, .form-panel { padding: 1.25rem; }
-.sim-layout { display: grid; gap: 1.25rem; }
-.sim-main { display: grid; gap: 1.25rem; }
+.sim-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+.sim-main { display: grid; gap: 1.25rem; width: 100%; min-width: 0; }
 .sim-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.7rem; }
 
 .sim-tab {
@@ -178,7 +178,7 @@ a { color: inherit; }
   font-weight: 800;
 }
 
-.review-panel { display: grid; gap: 1rem; }
+.review-panel { display: grid; gap: 1rem; width: 100%; }
 .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
 .review-card { padding: 1rem; border-radius: 20px; border: 1px solid rgba(181, 197, 214, 0.8); background: rgba(255, 255, 255, 0.92); }
 
