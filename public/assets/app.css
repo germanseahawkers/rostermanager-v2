@@ -97,6 +97,13 @@ a { color: inherit; }
   max-width: none;
 }
 
+.share-hero-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .sim-hero-copy h1 {
   margin: 0.4rem 0 0;
   font-size: clamp(2rem, 5vw, 4rem);
@@ -159,8 +166,25 @@ a { color: inherit; }
   justify-content: flex-start;
 }
 
+.share-hero-actions .button {
+  background: var(--preview-secondary, var(--secondary));
+  color: var(--preview-ink, var(--ink));
+}
+
+.share-hero-actions .button.secondary {
+  background: var(--preview-surface, #ffffff);
+  color: var(--preview-ink, var(--ink));
+  border: 1px solid var(--preview-line, rgba(181, 197, 214, 0.8));
+}
+
 .share-metric-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.share-club-note {
+  margin-top: 0;
+  max-width: 420px;
+  flex: 0 1 420px;
 }
 
 .pill, .status-chip, .panel-count {
@@ -492,12 +516,48 @@ th, td {
 
 .empty-copy { padding: 1rem; border-radius: 18px; background: rgba(215, 228, 240, 0.45); color: var(--muted); }
 .share-review-grid .review-card { min-height: 100%; }
-.share-group + .share-group { margin-top: 1rem; }
+.share-group + .share-group { margin-top: 0.9rem; }
+.share-group {
+  border-top: 1px solid var(--preview-line, rgba(181, 197, 214, 0.4));
+  padding-top: 0.9rem;
+}
+
+.share-group:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.share-group-summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.share-group-summary::-webkit-details-marker {
+  display: none;
+}
+
 .share-group h3 {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  margin: 0;
+}
+
+.share-group h3::after {
+  content: "+";
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--preview-muted, var(--muted));
+}
+
+.share-group[open] h3::after {
+  content: "−";
+}
+
+.share-group > .muted,
+.share-group > .share-player-grid {
+  margin-top: 0.75rem;
 }
 
 .name-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
@@ -507,6 +567,7 @@ th, td {
   .sim-layout, .sim-hero, .sim-hero.compact, .sim-board, .split { grid-template-columns: 1fr; }
   .sticky-panel { position: static; }
   .share-hero-tools { grid-template-columns: 1fr; }
+  .share-hero-topline { flex-direction: column; }
 }
 
 @media (max-width: 760px) {
@@ -518,4 +579,5 @@ th, td {
   .review-head-meta { justify-items: start; }
   .intro-shape-grid { grid-template-columns: 1fr; }
   .share-hero-actions { width: 100%; }
+  .share-club-note { max-width: none; width: 100%; }
 }

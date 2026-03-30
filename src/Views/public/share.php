@@ -47,29 +47,31 @@ ob_start();
 ?>
 <section class="sim-hero share-hero-full personalized-panel" style="<?= htmlspecialchars(share_palette_style($palette), ENT_QUOTES, 'UTF-8') ?>">
     <div class="sim-hero-copy share-hero-copy">
-        <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['name']), ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="share-hero-topline">
+            <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['name']), ENT_QUOTES, 'UTF-8') ?></div>
+            <?php if ($clubName !== ''): ?>
+                <<?= $clubUrl !== '' ? 'a' : 'div' ?>
+                    class="club-note share-club-note"
+                    <?php if ($clubUrl !== ''): ?>
+                        href="<?= htmlspecialchars($clubUrl, ENT_QUOTES, 'UTF-8') ?>"
+                        target="_blank"
+                        rel="noreferrer"
+                    <?php endif; ?>
+                >
+                    <?php if ($clubLogoUrl !== ''): ?>
+                        <img class="club-note-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>">
+                    <?php endif; ?>
+                    <div>
+                        <strong><?= htmlspecialchars(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?></strong>
+                        <?php if ($clubDescription !== ''): ?>
+                            <div class="club-note-copy"><?= htmlspecialchars($clubDescription, ENT_QUOTES, 'UTF-8') ?></div>
+                        <?php endif; ?>
+                    </div>
+                </<?= $clubUrl !== '' ? 'a' : 'div' ?>>
+            <?php endif; ?>
+        </div>
         <h1><?= htmlspecialchars($personalizedTitle, ENT_QUOTES, 'UTF-8') ?></h1>
         <p class="lead"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
-        <?php if ($clubName !== ''): ?>
-            <<?= $clubUrl !== '' ? 'a' : 'div' ?>
-                class="club-note"
-                <?php if ($clubUrl !== ''): ?>
-                    href="<?= htmlspecialchars($clubUrl, ENT_QUOTES, 'UTF-8') ?>"
-                    target="_blank"
-                    rel="noreferrer"
-                <?php endif; ?>
-            >
-                <?php if ($clubLogoUrl !== ''): ?>
-                    <img class="club-note-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>">
-                <?php endif; ?>
-                <div>
-                    <strong><?= htmlspecialchars(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?></strong>
-                    <?php if ($clubDescription !== ''): ?>
-                        <div class="club-note-copy"><?= htmlspecialchars($clubDescription, ENT_QUOTES, 'UTF-8') ?></div>
-                    <?php endif; ?>
-                </div>
-            </<?= $clubUrl !== '' ? 'a' : 'div' ?>>
-        <?php endif; ?>
 
         <div class="share-hero-tools">
             <div class="metric-grid share-metric-grid">
@@ -95,8 +97,10 @@ ob_start();
         <article class="review-card">
             <h2><?= htmlspecialchars($section['label'], ENT_QUOTES, 'UTF-8') ?></h2>
             <?php foreach ($section['groups'] as $group): ?>
-                <div class="share-group">
-                    <h3><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?> <span><?= (int) $group['count_selected'] ?></span></h3>
+                <details class="share-group">
+                    <summary class="share-group-summary">
+                        <h3><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?> <span><?= (int) $group['count_selected'] ?></span></h3>
+                    </summary>
                     <?php if ($group['selected'] === []): ?>
                         <p class="muted">—</p>
                     <?php else: ?>
@@ -140,7 +144,7 @@ ob_start();
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
-                </div>
+                </details>
             <?php endforeach; ?>
         </article>
     <?php endforeach; ?>
