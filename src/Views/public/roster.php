@@ -88,19 +88,8 @@ ob_start();
             <div class="club-panel-name"><?= htmlspecialchars($t['intro_title'], ENT_QUOTES, 'UTF-8') ?></div>
         </div>
         <p class="muted intro-lead"><?= htmlspecialchars($t['intro_body'], ENT_QUOTES, 'UTF-8') ?></p>
+        <p class="muted intro-lead"><?= htmlspecialchars($t['intro_body_followup'], ENT_QUOTES, 'UTF-8') ?></p>
         <div class="intro-sections">
-            <section class="intro-section">
-                <h3><?= htmlspecialchars($t['intro_build_title'], ENT_QUOTES, 'UTF-8') ?></h3>
-                <p class="muted"><?= htmlspecialchars($t['intro_build_body'], ENT_QUOTES, 'UTF-8') ?></p>
-            </section>
-            <section class="intro-section">
-                <h3><?= htmlspecialchars($t['intro_share_title'], ENT_QUOTES, 'UTF-8') ?></h3>
-                <p class="muted"><?= htmlspecialchars($t['intro_share_body'], ENT_QUOTES, 'UTF-8') ?></p>
-            </section>
-            <section class="intro-section">
-                <h3><?= htmlspecialchars($t['intro_adjust_title'], ENT_QUOTES, 'UTF-8') ?></h3>
-                <p class="muted"><?= htmlspecialchars($t['intro_adjust_body'], ENT_QUOTES, 'UTF-8') ?></p>
-            </section>
             <section class="intro-section intro-shape">
                 <h3><?= htmlspecialchars($t['intro_shape_title'], ENT_QUOTES, 'UTF-8') ?></h3>
                 <p class="muted"><?= htmlspecialchars($t['intro_shape_body'], ENT_QUOTES, 'UTF-8') ?></p>
