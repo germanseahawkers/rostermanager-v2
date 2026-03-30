@@ -13,6 +13,7 @@ $clubDescription = trim((string) ($t['club_branding_copy'] ?? ''));
 $shareUrl = trim((string) ($shareUrl ?? ''));
 $shareCardUrl = trim((string) ($shareCardUrl ?? ''));
 $simulatorUrl = trim((string) ($simulatorUrl ?? ''));
+$ogImageUrl = trim((string) ($ogImageUrl ?? $shareCardUrl));
 $shareDescriptionTemplate = trim((string) ($author !== ''
     ? ($t['share_meta_description_named'] ?? '')
     : ($t['share_meta_description_default'] ?? '')));
@@ -207,7 +208,7 @@ echo App\Core\View::make('layouts/app', [
     'metaTitle' => $personalizedTitle,
     'metaDescription' => $shareDescription,
     'canonicalUrl' => $shareUrl,
-    'ogImageUrl' => $shareCardUrl,
+    'ogImageUrl' => $ogImageUrl,
     'ogType' => 'article',
     'lang' => $locale,
     'content' => $content,

@@ -69,6 +69,13 @@ final class PublicRosterController
             (int) $this->config['team']['simulator']['roster_limit']
         );
         $shareLinks = $this->buildShareLinks($persistedShare['token'] ?? null, $locale, $simulator['selected_ids'], $author, $palette['key']);
+        $clubLogoPath = trim((string) ($this->config['club']['logo_path'] ?? ''));
+        $shareCardUrl = $this->absoluteUrl($request, $shareLinks['share_card_url']);
+        $ogImageUrl = $shareCardUrl;
+
+        if ($clubLogoPath !== '') {
+            $ogImageUrl = $this->absoluteUrl($request, public_asset_url($clubLogoPath, $this->config));
+        }
 
         return Response::html(View::make('public/share', [
             'config' => $this->config,
@@ -78,8 +85,9 @@ final class PublicRosterController
             'author' => $author,
             'palette' => $palette,
             'shareUrl' => $this->absoluteUrl($request, $shareLinks['share_url']),
-            'shareCardUrl' => $this->absoluteUrl($request, $shareLinks['share_card_url']),
+            'shareCardUrl' => $shareCardUrl,
             'simulatorUrl' => $this->absoluteUrl($request, $shareLinks['simulator_url']),
+            'ogImageUrl' => $ogImageUrl,
         ]));
     }
 
