@@ -11,10 +11,42 @@ $palette = $palette ?? resolve_share_palette('primary', $config, $locale);
 $personalizedTitle = personalized_roster_title($t, $author);
 $clubDescription = trim((string) ($t['club_branding_copy'] ?? ''));
 
+$formatExperience = static function (mixed $value) use ($t): string {
+    $normalized = is_string($value) || is_numeric($value) ? trim((string) $value) : '';
+
+    if ($normalized === '') {
+        return '';
+    }
+
+    if (!ctype_digit($normalized)) {
+        return $normalized;
+    }
+
+    $years = (int) $normalized;
+
+    if ($years === 0) {
+        return (string) ($t['experience_rookie'] ?? 'Rookie');
+    }
+
+    if ($years === 1) {
+        return '1 ' . ($t['experience_year_singular'] ?? 'year');
+    }
+
+    return $years . ' ' . ($t['experience_year_plural'] ?? 'years');
+};
+
+$playerImageUrl = static function (string $path) use ($config): string {
+    if (preg_match('/^https?:\/\//i', $path) === 1) {
+        return $path;
+    }
+
+    return public_asset_url($path, $config);
+};
+
 ob_start();
 ?>
-<section class="sim-hero compact">
-    <div class="sim-hero-copy">
+<section class="sim-hero share-hero-full personalized-panel" style="<?= htmlspecialchars(share_palette_style($palette), ENT_QUOTES, 'UTF-8') ?>">
+    <div class="sim-hero-copy share-hero-copy">
         <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['name']), ENT_QUOTES, 'UTF-8') ?></div>
         <h1><?= htmlspecialchars($personalizedTitle, ENT_QUOTES, 'UTF-8') ?></h1>
         <p class="lead"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
@@ -38,21 +70,22 @@ ob_start();
                 </div>
             </<?= $clubUrl !== '' ? 'a' : 'div' ?>>
         <?php endif; ?>
-    </div>
-    <div class="card-panel">
-        <div class="metric-grid">
-            <div class="metric-box">
-                <span><?= htmlspecialchars($t['selected_label'], ENT_QUOTES, 'UTF-8') ?></span>
-                <strong><?= (int) $simulator['selected_count'] ?></strong>
+
+        <div class="share-hero-tools">
+            <div class="metric-grid share-metric-grid">
+                <div class="metric-box">
+                    <span><?= htmlspecialchars($t['selected_label'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <strong><?= (int) $simulator['selected_count'] ?></strong>
+                </div>
+                <div class="metric-box">
+                    <span><?= htmlspecialchars($t['remaining_label'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <strong><?= (int) $simulator['remaining'] ?></strong>
+                </div>
             </div>
-            <div class="metric-box">
-                <span><?= htmlspecialchars($t['remaining_label'], ENT_QUOTES, 'UTF-8') ?></span>
-                <strong><?= (int) $simulator['remaining'] ?></strong>
+            <div class="share-actions share-hero-actions">
+                <a class="button" href="<?= htmlspecialchars($simulatorUrl, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t['load_this_roster'], ENT_QUOTES, 'UTF-8') ?></a>
+                <a class="button secondary" href="<?= htmlspecialchars($shareCardUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
             </div>
-        </div>
-        <div class="share-actions">
-            <a class="button" href="<?= htmlspecialchars($simulatorUrl, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t['load_this_roster'], ENT_QUOTES, 'UTF-8') ?></a>
-            <a class="button secondary" href="<?= htmlspecialchars($shareCardUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
         </div>
     </div>
 </section>
@@ -67,11 +100,45 @@ ob_start();
                     <?php if ($group['selected'] === []): ?>
                         <p class="muted">—</p>
                     <?php else: ?>
-                        <ul class="name-list">
+                        <div class="player-grid share-player-grid">
                             <?php foreach ($group['selected'] as $player): ?>
-                                <li><?= htmlspecialchars($player['name'], ENT_QUOTES, 'UTF-8') ?></li>
+                                <?php
+                                $experience = $formatExperience($player['experience'] ?? '');
+                                $heightCm = metric_height_cm($player);
+                                $weightKg = metric_weight_kg($player);
+                                $measurements = [];
+
+                                if ($heightCm !== null && $heightCm > 0) {
+                                    $measurements[] = $heightCm . ' cm';
+                                }
+
+                                if ($weightKg !== null && $weightKg > 0) {
+                                    $measurements[] = $weightKg . ' kg';
+                                }
+                                ?>
+                                <article class="player-card share-player-card">
+                                    <div class="player-avatar">
+                                        <?php if (!empty($player['image'])): ?>
+                                            <img class="player-photo" src="<?= htmlspecialchars($playerImageUrl((string) $player['image']), ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($player['name'], ENT_QUOTES, 'UTF-8') ?>">
+                                        <?php else: ?>
+                                            <?= htmlspecialchars(substr((string) ($player['position'] ?? '?'), 0, 3), ENT_QUOTES, 'UTF-8') ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <div class="player-name"><?= htmlspecialchars($player['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                                        <div class="player-meta">
+                                            <?= htmlspecialchars((string) ($player['group_label'] ?? $group['label']), ENT_QUOTES, 'UTF-8') ?>
+                                            <?php if ($experience !== ''): ?>
+                                                · <?= htmlspecialchars($experience, ENT_QUOTES, 'UTF-8') ?>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php if ($measurements !== []): ?>
+                                            <div class="hint"><?= htmlspecialchars(implode(' · ', $measurements), ENT_QUOTES, 'UTF-8') ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
                             <?php endforeach; ?>
-                        </ul>
+                        </div>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
