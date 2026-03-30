@@ -141,7 +141,7 @@ ob_start();
                 ESPN team ID
                 <input type="number" min="1" name="team_id" value="<?= htmlspecialchars((string) ($config['team']['espn_id'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
             </label>
-            <label style="display: flex; align-items: center; gap: 0.6rem; font-weight: 600;">
+            <label class="checkbox-field">
                 <input type="checkbox" name="download_images" value="1">
                 <span>Download player images and store them locally</span>
             </label>
