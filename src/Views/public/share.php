@@ -13,7 +13,14 @@ $clubDescription = trim((string) ($t['club_branding_copy'] ?? ''));
 $shareUrl = trim((string) ($shareUrl ?? ''));
 $shareCardUrl = trim((string) ($shareCardUrl ?? ''));
 $simulatorUrl = trim((string) ($simulatorUrl ?? ''));
-$shareDescription = trim((string) ($t['review_body'] ?? ''));
+$shareDescriptionTemplate = trim((string) ($author !== ''
+    ? ($t['share_meta_description_named'] ?? '')
+    : ($t['share_meta_description_default'] ?? '')));
+$shareDescription = $shareDescriptionTemplate;
+
+if ($author !== '' && $shareDescriptionTemplate !== '') {
+    $shareDescription = trim(sprintf($shareDescriptionTemplate, $author));
+}
 
 $formatExperience = static function (mixed $value) use ($t): string {
     $normalized = is_string($value) || is_numeric($value) ? trim((string) $value) : '';
