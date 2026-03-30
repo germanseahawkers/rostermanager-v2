@@ -35,6 +35,7 @@ final class PublicRosterController
             $selectedIds,
             (int) $this->config['team']['simulator']['roster_limit']
         );
+        $shareLinks = $this->buildShareLinks($persistedShare['token'] ?? null, $locale, $simulator['selected_ids'], $author, $palette['key']);
 
         return Response::html(View::make('public/roster', [
             'config' => $this->config,
@@ -47,6 +48,7 @@ final class PublicRosterController
             'paletteOptions' => share_palette_options($this->config, $locale),
             'shareUrl' => $this->config['app']['base_path'] . '/share?lang=' . $locale,
             'shareCreateUrl' => $this->config['app']['base_path'] . '/share/create',
+            'initialShareLinks' => $persistedShare !== null ? $shareLinks : null,
         ]));
     }
 

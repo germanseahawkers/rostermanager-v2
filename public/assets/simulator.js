@@ -45,7 +45,7 @@
   state.personalization = state.personalization || { author: "", scheme: "primary", palettes: {} };
   const shareCache = new Map();
   let shareRequestId = 0;
-  let activeShareLinks = null;
+  let activeShareLinks = state.initialShareLinks || null;
 
   function selectedIdsArray() {
     return Array.from(selectedIds).sort((a, b) => a - b);
@@ -427,6 +427,7 @@
 
   updateCounts();
   updatePersonalization();
-  resetShareState();
+  if (activeShareLinks) applyShareLinks(activeShareLinks);
+  else resetShareState();
   renderGroup();
 })();

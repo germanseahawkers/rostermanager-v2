@@ -33,6 +33,7 @@ $simulatorConfig = [
     'basePath' => $config['app']['base_path'],
     'shareCreateUrl' => $shareCreateUrl ?? ($config['app']['base_path'] . '/share/create'),
     'csrfToken' => csrf_token(),
+    'initialShareLinks' => $initialShareLinks ?? null,
     'labels' => [
         'summaryShort' => $t['summary_short'],
         'selected' => $t['selected_label'],
@@ -231,11 +232,16 @@ ob_start();
             <div class="share-box">
                 <h3><?= htmlspecialchars($t['share_title'], ENT_QUOTES, 'UTF-8') ?></h3>
                 <p class="muted"><?= htmlspecialchars($t['share_body'], ENT_QUOTES, 'UTF-8') ?></p>
-                <input type="text" readonly data-share-url value="<?= htmlspecialchars($t['share_pending'], ENT_QUOTES, 'UTF-8') ?>">
+                <input
+                    type="text"
+                    readonly
+                    data-share-url
+                    value="<?= htmlspecialchars(($initialShareLinks['share_url'] ?? '') !== '' ? public_asset_url((string) $initialShareLinks['share_url'], $config) : $t['share_pending'], ENT_QUOTES, 'UTF-8') ?>"
+                >
                 <div class="share-actions">
                     <button type="button" data-copy-link><?= htmlspecialchars($t['copy_link'], ENT_QUOTES, 'UTF-8') ?></button>
-                    <a class="button secondary" data-share-page href="#"><?= htmlspecialchars($t['open_share'], ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="button secondary" data-share-card href="#" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="button secondary" data-share-page href="<?= htmlspecialchars(($initialShareLinks['share_url'] ?? '') !== '' ? public_asset_url((string) $initialShareLinks['share_url'], $config) : '#', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t['open_share'], ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="button secondary" data-share-card href="<?= htmlspecialchars(($initialShareLinks['share_card_url'] ?? '') !== '' ? public_asset_url((string) $initialShareLinks['share_card_url'], $config) : '#', ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
                     <a class="button secondary" data-whatsapp-link href="#"><?= htmlspecialchars($t['share_whatsapp'], ENT_QUOTES, 'UTF-8') ?></a>
                     <button type="button" class="secondary" data-native-share><?= htmlspecialchars($t['share_native'], ENT_QUOTES, 'UTF-8') ?></button>
                 </div>
