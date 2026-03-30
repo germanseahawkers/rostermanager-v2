@@ -292,10 +292,6 @@ a { color: inherit; }
 }
 
 .personalized-panel h2,
-.personalized-panel h3,
-.personalized-panel strong,
-.personalized-panel .summary-line,
-.personalized-panel .share-box,
 .personalized-panel .personalize-label {
   color: var(--preview-text, var(--ink));
 }
@@ -306,6 +302,15 @@ a { color: inherit; }
   background: var(--preview-surface, #ffffff);
   color: var(--preview-ink, var(--ink));
   border-color: var(--preview-line, rgba(181, 197, 214, 0.8));
+}
+
+.personalized-panel .metric-box strong,
+.personalized-panel .review-card,
+.personalized-panel .review-card h3,
+.personalized-panel .review-card strong,
+.personalized-panel .review-card .summary-line,
+.personalized-panel .share-box h3 {
+  color: var(--preview-ink, var(--ink));
 }
 
 .personalized-panel .summary-line {
