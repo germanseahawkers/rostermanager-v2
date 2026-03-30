@@ -46,6 +46,7 @@ $simulatorConfig = [
         'experienceYearPlural' => $t['experience_year_plural'],
         'selectedRoster' => $t['selected_roster'],
         'selectedRosterNamed' => $t['selected_roster_named'],
+        'sharePending' => $t['share_pending'],
         'shareGenerating' => $t['share_generating'],
         'shareUnavailable' => $t['share_unavailable'],
     ],
@@ -230,7 +231,7 @@ ob_start();
             <div class="share-box">
                 <h3><?= htmlspecialchars($t['share_title'], ENT_QUOTES, 'UTF-8') ?></h3>
                 <p class="muted"><?= htmlspecialchars($t['share_body'], ENT_QUOTES, 'UTF-8') ?></p>
-                <input type="text" readonly data-share-url value="<?= htmlspecialchars($t['share_generating'], ENT_QUOTES, 'UTF-8') ?>">
+                <input type="text" readonly data-share-url value="<?= htmlspecialchars($t['share_pending'], ENT_QUOTES, 'UTF-8') ?>">
                 <div class="share-actions">
                     <button type="button" data-copy-link><?= htmlspecialchars($t['copy_link'], ENT_QUOTES, 'UTF-8') ?></button>
                     <a class="button secondary" data-share-page href="#"><?= htmlspecialchars($t['open_share'], ENT_QUOTES, 'UTF-8') ?></a>

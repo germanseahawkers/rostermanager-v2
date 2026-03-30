@@ -45,6 +45,7 @@
   state.personalization = state.personalization || { author: "", scheme: "primary", palettes: {} };
   const shareCache = new Map();
   let shareRequestId = 0;
+  let activeShareLinks = null;
 
   function selectedIdsArray() {
     return Array.from(selectedIds).sort((a, b) => a - b);
@@ -201,12 +202,7 @@
 
   }
 
-  function updateShareLinks() {
-    if (state.shareCreateUrl && state.csrfToken) {
-      void requestShortShareLinks();
-      return;
-    }
-
+  function buildDirectShareLinks() {
     const shareUrl = buildShareUrl();
     const cardUrl = new URL(`${state.basePath}/share/card.svg`, window.location.origin);
     cardUrl.searchParams.set("lang", state.locale);
@@ -223,10 +219,12 @@
     const whatsappUrl = new URL("https://wa.me/");
     whatsappUrl.searchParams.set("text", `${state.labels.shareCaption}: ${shareUrl.toString()}`);
 
-    shareUrlInput.value = shareUrl.toString();
-    sharePageLink.href = shareUrl.toString();
-    shareCardLink.href = cardUrl.toString();
-    whatsappLink.href = whatsappUrl.toString();
+    return {
+      share_url: shareUrl.toString(),
+      share_card_url: cardUrl.toString(),
+      simulator_url: shareUrl.toString(),
+      whatsapp_url: whatsappUrl.toString(),
+    };
   }
 
   function shareFingerprint() {
@@ -241,24 +239,45 @@
   function applyShareLinks(payload) {
     const shareUrl = String(payload.share_url || "");
     const shareCardUrl = String(payload.share_card_url || "");
-    const simulatorUrl = String(payload.simulator_url || "");
     const whatsappUrl = new URL("https://wa.me/");
     whatsappUrl.searchParams.set("text", `${state.labels.shareCaption}: ${shareUrl}`);
 
+    activeShareLinks = {
+      share_url: shareUrl,
+      share_card_url: shareCardUrl,
+      simulator_url: String(payload.simulator_url || ""),
+      whatsapp_url: whatsappUrl.toString(),
+    };
     shareUrlInput.value = shareUrl;
     sharePageLink.href = shareUrl;
     shareCardLink.href = shareCardUrl;
     whatsappLink.href = whatsappUrl.toString();
-    nativeShareButton?.removeAttribute("disabled");
-    copyLinkButton?.removeAttribute("disabled");
   }
 
-  async function requestShortShareLinks() {
+  function resetShareState() {
+    activeShareLinks = null;
+    shareUrlInput.value = state.labels.sharePending || "Short link will be created when you share.";
+    sharePageLink.href = "#";
+    shareCardLink.href = "#";
+    whatsappLink.href = "#";
+  }
+
+  async function ensureShareLinks() {
+    if (activeShareLinks) {
+      return activeShareLinks;
+    }
+
+    if (!state.shareCreateUrl || !state.csrfToken) {
+      const fallbackLinks = buildDirectShareLinks();
+      applyShareLinks(fallbackLinks);
+      return activeShareLinks;
+    }
+
     const key = shareFingerprint();
 
     if (shareCache.has(key)) {
       applyShareLinks(shareCache.get(key));
-      return;
+      return activeShareLinks;
     }
 
     const requestId = ++shareRequestId;
@@ -266,8 +285,6 @@
     sharePageLink.href = "#";
     shareCardLink.href = "#";
     whatsappLink.href = "#";
-    nativeShareButton?.setAttribute("disabled", "disabled");
-    copyLinkButton?.setAttribute("disabled", "disabled");
 
     try {
       const payload = new URLSearchParams();
@@ -298,10 +315,12 @@
 
       shareCache.set(key, data);
       applyShareLinks(data);
+      return activeShareLinks;
     } catch (error) {
       if (requestId !== shareRequestId) return;
 
       shareUrlInput.value = state.labels.shareUnavailable || "Short link could not be created.";
+      throw error;
     }
   }
 
@@ -338,7 +357,7 @@
 
     updateUrlState();
     updateCounts();
-    updateShareLinks();
+    resetShareState();
     renderGroup();
   }
 
@@ -353,7 +372,7 @@
     state.personalization.author = authorInput.value.trim().slice(0, 40);
     updatePersonalization();
     updateUrlState();
-    updateShareLinks();
+    resetShareState();
   });
 
   paletteButtons.forEach((button) => {
@@ -361,18 +380,54 @@
       state.personalization.scheme = button.dataset.paletteScheme || "primary";
       updatePersonalization();
       updateUrlState();
-      updateShareLinks();
+      resetShareState();
     });
   });
 
   copyLinkButton?.addEventListener("click", async () => {
     try {
+      await ensureShareLinks();
       await navigator.clipboard.writeText(shareUrlInput.value);
       if (copyFeedback) copyFeedback.textContent = state.labels.copyDone;
     } catch (error) {
-      shareUrlInput.select();
-      document.execCommand("copy");
-      if (copyFeedback) copyFeedback.textContent = state.labels.copyDone;
+      if (/^https?:\/\//i.test(shareUrlInput.value)) {
+        shareUrlInput.select();
+        document.execCommand("copy");
+        if (copyFeedback) copyFeedback.textContent = state.labels.copyDone;
+      }
+    }
+  });
+
+  sharePageLink?.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    try {
+      const links = await ensureShareLinks();
+      if (links?.share_url) window.location.href = links.share_url;
+    } catch (error) {
+      // Leave the generated error message in the input field.
+    }
+  });
+
+  shareCardLink?.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    try {
+      const links = await ensureShareLinks();
+      if (links?.share_card_url) window.open(links.share_card_url, "_blank", "noreferrer");
+    } catch (error) {
+      // Leave the generated error message in the input field.
+    }
+  });
+
+  whatsappLink?.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    try {
+      const links = await ensureShareLinks();
+      if (links?.whatsapp_url) window.open(links.whatsapp_url, "_blank", "noreferrer");
+    } catch (error) {
+      // Leave the generated error message in the input field.
     }
   });
 
@@ -380,10 +435,11 @@
     if (!navigator.share) return;
 
     try {
+      const links = await ensureShareLinks();
       await navigator.share({
         title: document.title,
         text: state.labels.shareCaption,
-        url: shareUrlInput.value,
+        url: links?.share_url || shareUrlInput.value,
       });
     } catch (error) {
       // Ignore cancelled share.
@@ -392,6 +448,6 @@
 
   updateCounts();
   updatePersonalization();
-  updateShareLinks();
+  resetShareState();
   renderGroup();
 })();
