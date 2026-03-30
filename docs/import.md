@@ -110,6 +110,24 @@ If local image download is enabled:
 
 This is the recommended default workflow for simple offseason maintenance.
 
+## Automated ESPN import via cron
+
+The same import flow is also available as a CLI script:
+
+```bash
+php scripts/import_espn.php
+```
+
+By default, the script uses `TEAM_ESPN_ID` from `.env`.
+
+Optional flags:
+
+```bash
+php scripts/import_espn.php --team-id=26 --download-images
+```
+
+This makes it easy to run a daily offseason sync via cron.
+
 ## CSV import
 
 The admin backend supports two import modes:

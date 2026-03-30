@@ -126,6 +126,22 @@ The backend then:
 
 If image download is enabled, player headshots are stored locally in `public/uploads/players/`.
 
+### Automated ESPN import via cron
+
+You can run the same sync from the command line and schedule it with cron:
+
+```bash
+php scripts/import_espn.php
+```
+
+Optional flags:
+
+```bash
+php scripts/import_espn.php --team-id=26 --download-images
+```
+
+By default, the script uses `TEAM_ESPN_ID` from `.env` and exits with a non-zero status on failure.
+
 ### CSV import
 
 The admin player import supports two modes:

@@ -174,41 +174,12 @@ final class AdminPlayerController
 
     public function importEspn(Request $request): Response
     {
-        $storedImagePaths = [];
-
         try {
             $teamId = (int) $request->input('team_id', 0);
             $downloadImages = (string) $request->input('download_images', '') === '1';
-
-            if ($teamId <= 0) {
-                throw new \RuntimeException('Please provide a valid ESPN team ID.');
-            }
-
-            $payload = fetch_espn_roster_payload($teamId);
-            $import = import_espn_roster_rows($payload, $downloadImages);
-            $storedImagePaths = $import['stored_paths'];
-
-            $repository = new PlayerRepository($this->database->pdo());
-            $stats = $repository->import($import['rows']);
-
-            $teamName = (string) ($import['team_name'] ?? ('Team ' . $teamId));
-            $message = sprintf(
-                'ESPN import for %s finished. %d created, %d updated, %d deleted.',
-                $teamName,
-                (int) $stats['created'],
-                (int) $stats['updated'],
-                (int) $stats['deleted']
-            );
-
-            $message .= ' Ordering was preserved for updated players.';
-
-            if ((int) ($import['image_count'] ?? 0) > 0) {
-                $message .= sprintf(' %d image(s) stored locally.', (int) $import['image_count']);
-            }
-
-            Session::flash('success', $message);
+            $result = sync_espn_roster($this->database->pdo(), $teamId, $downloadImages);
+            Session::flash('success', format_espn_import_result_message($result));
         } catch (Throwable $exception) {
-            cleanup_imported_player_images($storedImagePaths);
             Session::flash('error', $exception->getMessage());
         }
 

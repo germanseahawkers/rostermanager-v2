@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Repositories\PlayerRepository;
 use App\Core\Request;
 
 function supported_locales(): array
@@ -1231,6 +1232,55 @@ function import_espn_roster_rows(array $payload, bool $downloadImages): array
         'image_count' => count($storedPaths),
         'stored_paths' => $storedPaths,
     ];
+}
+
+function sync_espn_roster(\PDO $pdo, int $teamId, bool $downloadImages): array
+{
+    $storedImagePaths = [];
+
+    try {
+        if ($teamId <= 0) {
+            throw new RuntimeException('Please provide a valid ESPN team ID.');
+        }
+
+        $payload = fetch_espn_roster_payload($teamId);
+        $import = import_espn_roster_rows($payload, $downloadImages);
+        $storedImagePaths = $import['stored_paths'];
+
+        $repository = new PlayerRepository($pdo);
+        $stats = $repository->import($import['rows']);
+
+        return [
+            'team_name' => (string) ($import['team_name'] ?? ('Team ' . $teamId)),
+            'image_count' => (int) ($import['image_count'] ?? 0),
+            'stored_paths' => $storedImagePaths,
+            'created' => (int) ($stats['created'] ?? 0),
+            'updated' => (int) ($stats['updated'] ?? 0),
+            'deleted' => (int) ($stats['deleted'] ?? 0),
+        ];
+    } catch (\Throwable $exception) {
+        cleanup_imported_player_images($storedImagePaths);
+        throw $exception;
+    }
+}
+
+function format_espn_import_result_message(array $result): string
+{
+    $message = sprintf(
+        'ESPN import for %s finished. %d created, %d updated, %d deleted.',
+        (string) ($result['team_name'] ?? 'Unknown team'),
+        (int) ($result['created'] ?? 0),
+        (int) ($result['updated'] ?? 0),
+        (int) ($result['deleted'] ?? 0)
+    );
+
+    $message .= ' Ordering was preserved for updated players.';
+
+    if ((int) ($result['image_count'] ?? 0) > 0) {
+        $message .= sprintf(' %d image(s) stored locally.', (int) $result['image_count']);
+    }
+
+    return $message;
 }
 
 function normalizePlayerArray(array $input): array
