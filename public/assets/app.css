@@ -445,8 +445,9 @@ a { color: inherit; }
 .personalized-panel .button.secondary,
 .personalized-panel button.secondary,
 .personalized-panel .palette-button {
-  background: var(--preview-surface-alt, rgba(215, 228, 240, 0.72));
+  background: var(--preview-surface, #ffffff);
   color: var(--preview-ink, var(--ink));
+  border: 1px solid var(--preview-line, rgba(181, 197, 214, 0.8));
 }
 
 .personalized-panel .button:not(.secondary),
