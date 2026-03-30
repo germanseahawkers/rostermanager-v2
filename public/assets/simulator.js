@@ -237,15 +237,15 @@
   }
 
   function applyShareLinks(payload) {
-    const shareUrl = String(payload.share_url || "");
-    const shareCardUrl = String(payload.share_card_url || "");
+    const shareUrl = new URL(String(payload.share_url || ""), window.location.origin).toString();
+    const shareCardUrl = new URL(String(payload.share_card_url || ""), window.location.origin).toString();
     const whatsappUrl = new URL("https://wa.me/");
     whatsappUrl.searchParams.set("text", `${state.labels.shareCaption}: ${shareUrl}`);
 
     activeShareLinks = {
       share_url: shareUrl,
       share_card_url: shareCardUrl,
-      simulator_url: String(payload.simulator_url || ""),
+      simulator_url: new URL(String(payload.simulator_url || ""), window.location.origin).toString(),
       whatsapp_url: whatsappUrl.toString(),
     };
     shareUrlInput.value = shareUrl;
