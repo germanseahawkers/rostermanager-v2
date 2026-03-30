@@ -107,6 +107,8 @@ If local image download is enabled:
 - headshots are downloaded server-side
 - files are stored under `public/uploads/players/`
 - imported player image paths are rewritten to local paths automatically
+- existing local player images are reused on later syncs
+- unreferenced local player images are removed automatically after a successful sync
 
 This is the recommended default workflow for simple offseason maintenance.
 

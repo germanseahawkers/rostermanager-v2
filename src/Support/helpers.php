@@ -1069,6 +1069,75 @@ function cleanup_imported_player_images(array $relativePaths): void
     }
 }
 
+function is_local_player_image(?string $path): bool
+{
+    $normalizedPath = ltrim(trim((string) $path), '/');
+
+    return $normalizedPath !== '' && str_starts_with($normalizedPath, 'uploads/players/');
+}
+
+function local_player_image_exists(?string $path): bool
+{
+    if (!is_local_player_image($path)) {
+        return false;
+    }
+
+    $absolutePath = dirname(__DIR__, 2) . '/public/' . ltrim((string) $path, '/');
+
+    return is_file($absolutePath);
+}
+
+function prune_unreferenced_player_images(\PDO $pdo): int
+{
+    $uploadDirectory = player_upload_directory();
+
+    if (!is_dir($uploadDirectory)) {
+        return 0;
+    }
+
+    $statement = $pdo->query('SELECT image FROM players WHERE image <> ""');
+    $referencedPaths = [];
+
+    foreach ($statement->fetchAll(\PDO::FETCH_COLUMN) as $imagePath) {
+        $normalizedPath = ltrim((string) $imagePath, '/');
+
+        if (is_local_player_image($normalizedPath)) {
+            $referencedPaths[$normalizedPath] = true;
+        }
+    }
+
+    $deletedCount = 0;
+    $files = scandir($uploadDirectory);
+
+    if (!is_array($files)) {
+        return 0;
+    }
+
+    foreach ($files as $file) {
+        if ($file === '.' || $file === '..') {
+            continue;
+        }
+
+        $absolutePath = $uploadDirectory . '/' . $file;
+
+        if (!is_file($absolutePath)) {
+            continue;
+        }
+
+        $relativePath = 'uploads/players/' . $file;
+
+        if (isset($referencedPaths[$relativePath])) {
+            continue;
+        }
+
+        if (@unlink($absolutePath)) {
+            $deletedCount++;
+        }
+    }
+
+    return $deletedCount;
+}
+
 function public_asset_url(string $path, array $config): string
 {
     if (preg_match('#^https?://#i', $path) === 1) {
@@ -1163,7 +1232,7 @@ function fetch_espn_roster_payload(int $teamId): array
     return $payload;
 }
 
-function import_espn_roster_rows(array $payload, bool $downloadImages): array
+function import_espn_roster_rows(array $payload, bool $downloadImages, array $existingPlayersById = []): array
 {
     $rows = [];
     $storedPaths = [];
@@ -1195,12 +1264,18 @@ function import_espn_roster_rows(array $payload, bool $downloadImages): array
             $seenIds[$id] = true;
 
             $image = trim((string) ($athlete['headshot']['href'] ?? ''));
+            $existingPlayer = $existingPlayersById[(int) $id] ?? null;
+            $existingImage = is_array($existingPlayer) ? trim((string) ($existingPlayer['image'] ?? '')) : '';
 
             if ($downloadImages && $image !== '') {
-                $contents = fetch_remote_content($image);
-                $basename = basename((string) parse_url($image, PHP_URL_PATH));
-                $image = store_imported_player_image_contents($contents, $basename !== '' ? $basename : ($id . '.png'));
-                $storedPaths[] = $image;
+                if (local_player_image_exists($existingImage)) {
+                    $image = $existingImage;
+                } else {
+                    $contents = fetch_remote_content($image);
+                    $basename = basename((string) parse_url($image, PHP_URL_PATH));
+                    $image = store_imported_player_image_contents($contents, $basename !== '' ? $basename : ($id . '.png'));
+                    $storedPaths[] = $image;
+                }
             }
 
             $rows[] = normalizePlayerArray([
@@ -1244,15 +1319,22 @@ function sync_espn_roster(\PDO $pdo, int $teamId, bool $downloadImages): array
         }
 
         $payload = fetch_espn_roster_payload($teamId);
-        $import = import_espn_roster_rows($payload, $downloadImages);
-        $storedImagePaths = $import['stored_paths'];
-
         $repository = new PlayerRepository($pdo);
+        $existingPlayersById = [];
+
+        foreach ($repository->all() as $player) {
+            $existingPlayersById[(int) $player['id']] = $player;
+        }
+
+        $import = import_espn_roster_rows($payload, $downloadImages, $existingPlayersById);
+        $storedImagePaths = $import['stored_paths'];
         $stats = $repository->import($import['rows']);
+        $prunedImages = prune_unreferenced_player_images($pdo);
 
         return [
             'team_name' => (string) ($import['team_name'] ?? ('Team ' . $teamId)),
             'image_count' => (int) ($import['image_count'] ?? 0),
+            'pruned_image_count' => $prunedImages,
             'stored_paths' => $storedImagePaths,
             'created' => (int) ($stats['created'] ?? 0),
             'updated' => (int) ($stats['updated'] ?? 0),
@@ -1278,6 +1360,10 @@ function format_espn_import_result_message(array $result): string
 
     if ((int) ($result['image_count'] ?? 0) > 0) {
         $message .= sprintf(' %d image(s) stored locally.', (int) $result['image_count']);
+    }
+
+    if ((int) ($result['pruned_image_count'] ?? 0) > 0) {
+        $message .= sprintf(' %d unreferenced local image(s) removed.', (int) $result['pruned_image_count']);
     }
 
     return $message;

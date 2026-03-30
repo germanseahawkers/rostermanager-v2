@@ -125,6 +125,7 @@ The backend then:
 - preserves existing manual ordering for updated players
 
 If image download is enabled, player headshots are stored locally in `public/uploads/players/`.
+Existing local player images are reused on later syncs, and files no longer referenced by any player record are removed automatically after a successful import.
 
 ### Automated ESPN import via cron
 
