@@ -77,24 +77,6 @@
     return playersForGroup(groupKey).filter((player) => !selectedIds.has(Number(player.id)));
   }
 
-  function updateUrlState() {
-    const url = new URL(window.location.href);
-    const roster = selectedIdsArray().join(",");
-
-    url.searchParams.delete("s");
-
-    if (roster) url.searchParams.set("roster", roster);
-    else url.searchParams.delete("roster");
-
-    if (state.personalization.author) url.searchParams.set("author", state.personalization.author);
-    else url.searchParams.delete("author");
-
-    if (state.personalization.scheme) url.searchParams.set("scheme", state.personalization.scheme);
-    else url.searchParams.delete("scheme");
-
-    window.history.replaceState({}, "", url.toString());
-  }
-
   function formatPersonalizedTitle() {
     const author = String(state.personalization.author || "").trim();
     if (!author) return state.labels.selectedRoster || "Your 53-man roster";
@@ -355,7 +337,6 @@
     if (selectedIds.has(playerId)) selectedIds.delete(playerId);
     else if (selectedIds.size < rosterLimit) selectedIds.add(playerId);
 
-    updateUrlState();
     updateCounts();
     resetShareState();
     renderGroup();
@@ -371,7 +352,6 @@
   authorInput?.addEventListener("input", () => {
     state.personalization.author = authorInput.value.trim().slice(0, 40);
     updatePersonalization();
-    updateUrlState();
     resetShareState();
   });
 
@@ -379,7 +359,6 @@
     button.addEventListener("click", () => {
       state.personalization.scheme = button.dataset.paletteScheme || "primary";
       updatePersonalization();
-      updateUrlState();
       resetShareState();
     });
   });
