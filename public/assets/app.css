@@ -142,7 +142,12 @@ a { color: inherit; }
 
 .sim-hero.share-hero-full .share-hero-copy {
   border-radius: 24px;
-  background: linear-gradient(135deg, #071c35 0%, var(--preview-primary, var(--primary)) 70%);
+  background: linear-gradient(
+    135deg,
+    #071c35 0%,
+    var(--preview-primary, var(--primary)) 58%,
+    var(--preview-secondary, var(--secondary)) 140%
+  );
   box-shadow: var(--shadow);
 }
 .club-note {
@@ -190,7 +195,7 @@ a { color: inherit; }
 
 .share-hero-actions .button {
   background: var(--preview-secondary, var(--secondary));
-  color: var(--preview-ink, var(--ink));
+  color: var(--preview-text, var(--text));
 }
 
 .share-hero-actions .button.secondary {
