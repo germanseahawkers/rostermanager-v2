@@ -114,9 +114,10 @@ a { color: inherit; }
 
 .sim-hero-copy.share-hero-copy h1 {
   margin-top: 0.15rem;
-  max-width: 18ch;
-  font-size: clamp(2.75rem, 4vw, 4.75rem);
-  text-wrap: pretty;
+  max-width: none;
+  font-size: clamp(2.6rem, 3.2vw, 4.4rem);
+  white-space: nowrap;
+  text-wrap: nowrap;
 }
 
 .lead {
@@ -189,9 +190,8 @@ a { color: inherit; }
 }
 
 .share-club-note {
-  margin-top: 0;
-  max-width: 420px;
-  flex: 0 1 420px;
+  margin-top: 1rem;
+  max-width: 560px;
 }
 
 .pill, .status-chip, .panel-count {
@@ -582,6 +582,10 @@ th, td {
   .sticky-panel { position: static; }
   .share-hero-tools { grid-template-columns: 1fr; }
   .share-hero-topline { flex-direction: column; }
+  .sim-hero-copy.share-hero-copy h1 {
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 
 @media (max-width: 760px) {

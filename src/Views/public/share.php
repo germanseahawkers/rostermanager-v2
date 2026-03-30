@@ -49,29 +49,29 @@ ob_start();
     <div class="sim-hero-copy share-hero-copy">
         <div class="share-hero-topline">
             <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['name']), ENT_QUOTES, 'UTF-8') ?></div>
-            <?php if ($clubName !== ''): ?>
-                <<?= $clubUrl !== '' ? 'a' : 'div' ?>
-                    class="club-note share-club-note"
-                    <?php if ($clubUrl !== ''): ?>
-                        href="<?= htmlspecialchars($clubUrl, ENT_QUOTES, 'UTF-8') ?>"
-                        target="_blank"
-                        rel="noreferrer"
-                    <?php endif; ?>
-                >
-                    <?php if ($clubLogoUrl !== ''): ?>
-                        <img class="club-note-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>">
-                    <?php endif; ?>
-                    <div>
-                        <strong><?= htmlspecialchars(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?></strong>
-                        <?php if ($clubDescription !== ''): ?>
-                            <div class="club-note-copy"><?= htmlspecialchars($clubDescription, ENT_QUOTES, 'UTF-8') ?></div>
-                        <?php endif; ?>
-                    </div>
-                </<?= $clubUrl !== '' ? 'a' : 'div' ?>>
-            <?php endif; ?>
         </div>
         <h1><?= htmlspecialchars($personalizedTitle, ENT_QUOTES, 'UTF-8') ?></h1>
         <p class="lead"><?= htmlspecialchars($t['review_body'], ENT_QUOTES, 'UTF-8') ?></p>
+        <?php if ($clubName !== ''): ?>
+            <<?= $clubUrl !== '' ? 'a' : 'div' ?>
+                class="club-note share-club-note"
+                <?php if ($clubUrl !== ''): ?>
+                    href="<?= htmlspecialchars($clubUrl, ENT_QUOTES, 'UTF-8') ?>"
+                    target="_blank"
+                    rel="noreferrer"
+                <?php endif; ?>
+            >
+                <?php if ($clubLogoUrl !== ''): ?>
+                    <img class="club-note-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>">
+                <?php endif; ?>
+                <div>
+                    <strong><?= htmlspecialchars(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?></strong>
+                    <?php if ($clubDescription !== ''): ?>
+                        <div class="club-note-copy"><?= htmlspecialchars($clubDescription, ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php endif; ?>
+                </div>
+            </<?= $clubUrl !== '' ? 'a' : 'div' ?>>
+        <?php endif; ?>
 
         <div class="share-hero-tools">
             <div class="metric-grid share-metric-grid">
