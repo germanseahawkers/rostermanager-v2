@@ -45,10 +45,6 @@ $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) :
                 <?php endif; ?>
             </span>
         </a>
-        <nav class="nav">
-            <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/"><?= htmlspecialchars($ui['nav_roster'], ENT_QUOTES, 'UTF-8') ?></a>
-            <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players"><?= htmlspecialchars($ui['nav_admin'], ENT_QUOTES, 'UTF-8') ?></a>
-        </nav>
     </div>
 </header>
 
@@ -58,7 +54,10 @@ $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) :
 
 <footer class="site-footer">
     <div class="container site-footer-inner">
-        <span class="muted"><?= htmlspecialchars($ui['built_with'], ENT_QUOTES, 'UTF-8') ?></span>
+        <nav class="nav footer-nav">
+            <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/"><?= htmlspecialchars($ui['nav_roster'], ENT_QUOTES, 'UTF-8') ?></a>
+            <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players"><?= htmlspecialchars($ui['nav_admin'], ENT_QUOTES, 'UTF-8') ?></a>
+        </nav>
         <span class="muted">
             <?php if ($clubName !== ''): ?>
                 <?= htmlspecialchars(($ui['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?>

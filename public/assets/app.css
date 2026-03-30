@@ -38,6 +38,10 @@ a { color: inherit; }
 .site-shell { padding-bottom: 2rem; }
 .brand, .sim-hero-copy h1, .card-panel h2, .card-panel h3 { font-family: "Space Grotesk", "Segoe UI", sans-serif; }
 .brand { font-size: 1.15rem; font-weight: 700; text-decoration: none; }
+.footer-nav {
+  justify-content: flex-start;
+  flex: 1 1 auto;
+}
 .brand-lockup {
   display: inline-flex;
   align-items: center;
