@@ -115,7 +115,8 @@ a { color: inherit; }
 .sim-hero-copy.share-hero-copy h1 {
   margin-top: 0.15rem;
   max-width: none;
-  font-size: clamp(2.6rem, 3.2vw, 4.4rem);
+  width: 100%;
+  font-size: clamp(2.2rem, 2.8vw, 4rem);
   white-space: nowrap;
   text-wrap: nowrap;
 }
@@ -130,6 +131,19 @@ a { color: inherit; }
 
 .share-hero-full .lead {
   max-width: 54rem;
+}
+
+.sim-hero.share-hero-full {
+  background: var(--preview-surface, var(--surface));
+  border-color: transparent;
+  box-shadow: none;
+  padding: 0.1rem;
+}
+
+.sim-hero.share-hero-full .share-hero-copy {
+  border-radius: 24px;
+  background: linear-gradient(135deg, #071c35 0%, var(--preview-primary, var(--primary)) 70%);
+  box-shadow: var(--shadow);
 }
 .club-note {
   display: inline-flex;
@@ -524,11 +538,45 @@ th, td {
 .empty-copy { padding: 1rem; border-radius: 18px; background: rgba(215, 228, 240, 0.45); color: var(--muted); }
 .share-review-grid {
   align-items: start;
+  background: var(--preview-surface, var(--surface));
+  border-color: transparent;
+  box-shadow: none;
+  padding: 0.1rem;
 }
 
 .share-review-grid .review-card {
   min-height: 0;
   align-self: start;
+  background: var(--preview-primary, var(--primary));
+  color: var(--preview-text, var(--text));
+  border-color: transparent;
+}
+
+.share-review-grid.personalized-panel h2,
+.share-review-grid .share-group h3,
+.share-review-grid .share-group h3::after {
+  color: var(--preview-text, var(--text));
+}
+
+.share-review-grid .share-group {
+  border-color: rgba(247, 251, 255, 0.22);
+}
+
+.share-review-grid .share-player-card {
+  background: linear-gradient(135deg, rgba(215, 228, 240, 0.5), var(--preview-surface, #ffffff));
+  color: var(--preview-ink, var(--ink));
+  border-color: var(--preview-line, rgba(181, 197, 214, 0.8));
+}
+
+.share-review-grid .share-player-card .player-name,
+.share-review-grid .share-player-card .player-meta,
+.share-review-grid .share-player-card .hint {
+  color: var(--preview-ink, var(--ink));
+}
+
+.share-review-grid .share-player-card .player-meta,
+.share-review-grid .share-player-card .hint {
+  color: var(--preview-muted, var(--muted));
 }
 .share-group + .share-group { margin-top: 0.9rem; }
 .share-group {
