@@ -99,7 +99,7 @@ ob_start();
             <?php foreach ($section['groups'] as $group): ?>
                 <details class="share-group">
                     <summary class="share-group-summary">
-                        <h3><?= htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8') ?> <span><?= (int) $group['count_selected'] ?></span></h3>
+                        <h3><?= htmlspecialchars($group['label'] . ' (' . (int) $group['count_selected'] . ')', ENT_QUOTES, 'UTF-8') ?></h3>
                     </summary>
                     <?php if ($group['selected'] === []): ?>
                         <p class="muted">—</p>

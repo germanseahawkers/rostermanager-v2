@@ -97,6 +97,11 @@ a { color: inherit; }
   max-width: none;
 }
 
+.share-hero-copy h1 {
+  max-width: 18ch;
+  font-size: clamp(2.5rem, 4vw, 4.6rem);
+}
+
 .share-hero-topline {
   display: flex;
   align-items: flex-start;
@@ -515,7 +520,14 @@ th, td {
 }
 
 .empty-copy { padding: 1rem; border-radius: 18px; background: rgba(215, 228, 240, 0.45); color: var(--muted); }
-.share-review-grid .review-card { min-height: 100%; }
+.share-review-grid {
+  align-items: start;
+}
+
+.share-review-grid .review-card {
+  min-height: 0;
+  align-self: start;
+}
 .share-group + .share-group { margin-top: 0.9rem; }
 .share-group {
   border-top: 1px solid var(--preview-line, rgba(181, 197, 214, 0.4));
@@ -538,8 +550,6 @@ th, td {
 
 .share-group h3 {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
   align-items: center;
   margin: 0;
 }
