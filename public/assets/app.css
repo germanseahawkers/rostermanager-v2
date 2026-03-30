@@ -452,7 +452,7 @@ a { color: inherit; }
 .personalized-panel .button:not(.secondary),
 .personalized-panel button:not(.secondary):not(.palette-button) {
   background: var(--preview-secondary, var(--secondary));
-  color: var(--preview-text, var(--text));
+  color: var(--preview-surface, #ffffff);
 }
 
 .review-row, .summary-line {
