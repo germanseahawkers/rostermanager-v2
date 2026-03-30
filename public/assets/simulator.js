@@ -260,7 +260,6 @@
     const requestId = ++shareRequestId;
     shareUrlInput.value = state.labels.shareGenerating || "Generating short link ...";
     sharePageLink.href = "#";
-    shareCardLink.href = "#";
     whatsappLink.href = "#";
 
     try {
