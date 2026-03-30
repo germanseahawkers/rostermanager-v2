@@ -38,6 +38,13 @@ final class Request
         return $_GET[$key] ?? $default;
     }
 
+    public function header(string $key, mixed $default = null): mixed
+    {
+        $normalizedKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
+
+        return $_SERVER[$normalizedKey] ?? $default;
+    }
+
     public function file(string $key): ?array
     {
         return $_FILES[$key] ?? null;

@@ -23,7 +23,7 @@ final class PublicRosterController
     {
         $repository = new PlayerRepository($this->database->pdo());
         $persistedShare = $this->resolveShare($request);
-        $locale = resolve_locale($request->query('lang', $persistedShare['lang'] ?? 'en'));
+        $locale = resolve_request_locale($request, $persistedShare);
         $translations = translations($locale);
         $author = normalize_share_author($request->query('author', $persistedShare['author'] ?? ''));
         $palette = resolve_share_palette((string) $request->query('scheme', $persistedShare['scheme'] ?? 'primary'), $this->config, $locale);
@@ -54,7 +54,7 @@ final class PublicRosterController
     {
         $repository = new PlayerRepository($this->database->pdo());
         $persistedShare = $this->resolveShare($request);
-        $locale = resolve_locale($request->query('lang', $persistedShare['lang'] ?? 'en'));
+        $locale = resolve_request_locale($request, $persistedShare);
         $translations = translations($locale);
         $author = normalize_share_author($request->query('author', $persistedShare['author'] ?? ''));
         $palette = resolve_share_palette((string) $request->query('scheme', $persistedShare['scheme'] ?? 'primary'), $this->config, $locale);
@@ -84,7 +84,7 @@ final class PublicRosterController
     {
         $repository = new PlayerRepository($this->database->pdo());
         $persistedShare = $this->resolveShare($request);
-        $locale = resolve_locale($request->query('lang', $persistedShare['lang'] ?? 'en'));
+        $locale = resolve_request_locale($request, $persistedShare);
         $author = normalize_share_author($request->query('author', $persistedShare['author'] ?? ''));
         $palette = resolve_share_palette((string) $request->query('scheme', $persistedShare['scheme'] ?? 'primary'), $this->config, $locale);
         $selectedIds = parse_roster_selection((string) $request->query('roster', $persistedShare['roster_player_ids'] ?? ''));

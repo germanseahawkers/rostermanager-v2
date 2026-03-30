@@ -23,6 +23,51 @@ function resolve_locale(mixed $value, string $default = 'en'): string
     return array_key_exists($locale, $supported) ? $locale : $default;
 }
 
+function preferred_locale_from_header(?string $header, string $default = 'en'): string
+{
+    if (!is_string($header) || trim($header) === '') {
+        return $default;
+    }
+
+    $supported = supported_locales();
+    $preferences = explode(',', strtolower($header));
+
+    foreach ($preferences as $preference) {
+        $languageRange = trim(explode(';', $preference)[0] ?? '');
+
+        if ($languageRange === '') {
+            continue;
+        }
+
+        if (array_key_exists($languageRange, $supported)) {
+            return $languageRange;
+        }
+
+        $primaryLanguage = explode('-', $languageRange)[0] ?? '';
+
+        if ($primaryLanguage !== '' && array_key_exists($primaryLanguage, $supported)) {
+            return $primaryLanguage;
+        }
+    }
+
+    return $default;
+}
+
+function resolve_request_locale(Request $request, ?array $share = null, string $default = 'en'): string
+{
+    $queryLocale = $request->query('lang');
+
+    if (is_string($queryLocale) && trim($queryLocale) !== '') {
+        return resolve_locale($queryLocale, $default);
+    }
+
+    if (is_array($share) && !empty($share['lang'])) {
+        return resolve_locale($share['lang'], $default);
+    }
+
+    return preferred_locale_from_header((string) $request->header('Accept-Language', ''), $default);
+}
+
 function normalize_share_author(mixed $value): string
 {
     $author = is_string($value) ? trim(preg_replace('/\s+/', ' ', $value) ?? '') : '';
