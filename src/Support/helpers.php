@@ -950,6 +950,159 @@ function public_asset_url(string $path, array $config): string
     return $basePath . '/' . $normalizedPath;
 }
 
+function fetch_remote_content(string $url): string
+{
+    if (function_exists('curl_init')) {
+        $handle = curl_init($url);
+
+        if ($handle === false) {
+            throw new RuntimeException('Could not initialize HTTP request.');
+        }
+
+        curl_setopt_array($handle, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_USERAGENT => 'RosterManager v2 ESPN Import',
+            CURLOPT_FAILONERROR => false,
+        ]);
+
+        $body = curl_exec($handle);
+        $status = (int) curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
+        $error = curl_error($handle);
+        curl_close($handle);
+
+        if (!is_string($body) || $body === '') {
+            throw new RuntimeException('The remote request returned an empty response.' . ($error !== '' ? ' ' . $error : ''));
+        }
+
+        if ($status < 200 || $status >= 300) {
+            throw new RuntimeException(sprintf('The remote request failed with HTTP %d.', $status));
+        }
+
+        return $body;
+    }
+
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'timeout' => 30,
+            'ignore_errors' => true,
+            'header' => "User-Agent: RosterManager v2 ESPN Import\r\n",
+        ],
+    ]);
+
+    $body = @file_get_contents($url, false, $context);
+    $headers = $http_response_header ?? [];
+    $statusLine = is_array($headers) && isset($headers[0]) ? (string) $headers[0] : '';
+
+    if (!is_string($body) || $body === '') {
+        throw new RuntimeException('The remote request returned an empty response.');
+    }
+
+    if ($statusLine !== '' && preg_match('/\s(\d{3})\s/', $statusLine, $matches) === 1) {
+        $status = (int) $matches[1];
+
+        if ($status < 200 || $status >= 300) {
+            throw new RuntimeException(sprintf('The remote request failed with HTTP %d.', $status));
+        }
+    }
+
+    return $body;
+}
+
+function fetch_espn_roster_payload(int $teamId): array
+{
+    $url = sprintf(
+        'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/%d/roster',
+        $teamId
+    );
+    $body = fetch_remote_content($url);
+    $payload = json_decode($body, true);
+
+    if (!is_array($payload)) {
+        throw new RuntimeException('The ESPN roster response could not be parsed.');
+    }
+
+    if (($payload['status'] ?? '') !== 'success' || !isset($payload['athletes']) || !is_array($payload['athletes'])) {
+        throw new RuntimeException('The ESPN roster response did not contain a valid athlete list.');
+    }
+
+    return $payload;
+}
+
+function import_espn_roster_rows(array $payload, bool $downloadImages): array
+{
+    $rows = [];
+    $storedPaths = [];
+    $seenIds = [];
+    $ordering = 10;
+
+    foreach (($payload['athletes'] ?? []) as $section) {
+        if (!is_array($section) || !isset($section['items']) || !is_array($section['items'])) {
+            continue;
+        }
+
+        foreach ($section['items'] as $athlete) {
+            if (!is_array($athlete)) {
+                continue;
+            }
+
+            $id = trim((string) ($athlete['id'] ?? ''));
+            $name = trim((string) ($athlete['displayName'] ?? $athlete['fullName'] ?? ''));
+            $position = strtoupper(trim((string) ($athlete['position']['abbreviation'] ?? '')));
+
+            if ($id === '' || !ctype_digit($id) || $name === '' || $position === '') {
+                continue;
+            }
+
+            if (isset($seenIds[$id])) {
+                continue;
+            }
+
+            $seenIds[$id] = true;
+
+            $image = trim((string) ($athlete['headshot']['href'] ?? ''));
+
+            if ($downloadImages && $image !== '') {
+                $contents = fetch_remote_content($image);
+                $basename = basename((string) parse_url($image, PHP_URL_PATH));
+                $image = store_imported_player_image_contents($contents, $basename !== '' ? $basename : ($id . '.png'));
+                $storedPaths[] = $image;
+            }
+
+            $rows[] = normalizePlayerArray([
+                'id' => $id,
+                'name' => $name,
+                'position' => $position,
+                'experience' => isset($athlete['experience']['years']) ? (string) (int) $athlete['experience']['years'] : '',
+                'weight_kg' => isset($athlete['weight']) && is_numeric($athlete['weight'])
+                    ? (string) (int) round((float) $athlete['weight'] * 0.45359237)
+                    : '',
+                'height_cm' => isset($athlete['height']) && is_numeric($athlete['height'])
+                    ? (string) (int) round((float) $athlete['height'] * 2.54)
+                    : '',
+                'image' => $image,
+                'ordering' => $ordering,
+            ]);
+
+            $ordering += 10;
+        }
+    }
+
+    if ($rows === []) {
+        throw new RuntimeException('The ESPN roster did not contain any importable players.');
+    }
+
+    return [
+        'rows' => $rows,
+        'team_name' => (string) ($payload['team']['displayName'] ?? ('Team ' . ($payload['team']['id'] ?? ''))),
+        'image_count' => count($storedPaths),
+        'stored_paths' => $storedPaths,
+    ];
+}
+
 function normalizePlayerArray(array $input): array
 {
     $id = null;

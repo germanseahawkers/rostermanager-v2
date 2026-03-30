@@ -15,6 +15,7 @@ Published by German Sea Hawkers e.V. and developed by Simon Kell.
 - Server-rendered SVG share card
 - Protected admin area
 - Player CRUD
+- Direct ESPN roster import from admin
 - CSV roster import
 - Optional local player image import via ZIP
 
@@ -97,6 +98,35 @@ Generated files are written into [`database/imports/`](database/imports/) by def
 More details are documented in [`docs/import.md`](docs/import.md).
 
 ## Admin import workflow
+
+The admin backend now supports two roster-maintenance paths:
+
+1. Direct ESPN import
+   Enter an ESPN team ID in the admin area and let PHP fetch, normalize and sync the roster directly.
+2. CSV import
+   Use this when you prefer a local preprocessing step or want to upload a CSV and optional ZIP manually.
+
+### Direct ESPN import
+
+The built-in ESPN import is the simplest offseason workflow:
+
+- enter an ESPN team ID such as `26` for the Seahawks
+- optionally enable local player image download
+- run the import directly in the admin backend
+
+The backend then:
+
+- fetches the roster from ESPN
+- maps the response to the internal player model
+- syncs by ESPN player ID
+- updates existing players
+- creates new players
+- deletes players no longer present in the ESPN roster
+- preserves existing manual ordering for updated players
+
+If image download is enabled, player headshots are stored locally in `public/uploads/players/`.
+
+### CSV import
 
 The admin player import supports two modes:
 

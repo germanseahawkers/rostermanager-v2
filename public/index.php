@@ -45,5 +45,6 @@ $router->get('/admin/players/edit', [$adminController, 'edit'], true);
 $router->post('/admin/players/update', [$adminController, 'update'], true);
 $router->post('/admin/players/delete', [$adminController, 'delete'], true);
 $router->post('/admin/players/import', [$adminController, 'importCsv'], true);
+$router->post('/admin/players/import/espn', [$adminController, 'importEspn'], true);
 
 $app->run();

@@ -132,6 +132,21 @@ ob_start();
             </label>
             <button type="submit">Import players</button>
         </form>
+
+        <form class="form-panel stack" method="post" action="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players/import/espn">
+            <input type="hidden" name="_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+            <h2>ESPN import</h2>
+            <p class="hint">Fetch the current team roster directly from ESPN and sync it to the database by ESPN player ID. Existing IDs are updated, missing IDs are removed, and manual ordering is preserved for players already in the database.</p>
+            <label>
+                ESPN team ID
+                <input type="number" min="1" name="team_id" value="<?= htmlspecialchars((string) ($config['team']['espn_id'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" required>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.6rem; font-weight: 600;">
+                <input type="checkbox" name="download_images" value="1">
+                <span>Download player images and store them locally</span>
+            </label>
+            <button type="submit">Import from ESPN</button>
+        </form>
     </div>
 </section>
 <?php

@@ -78,6 +78,40 @@ Notes:
 
 ## Admin import modes
 
+The admin backend supports two import paths:
+
+1. Direct ESPN import
+2. CSV-based import
+
+## Direct ESPN import
+
+The admin UI includes a built-in ESPN importer.
+
+You only need:
+
+- an ESPN team ID, such as `26` for the Seahawks
+- optional local image download if you want to store player headshots on your own server
+
+The backend will then:
+
+- request the ESPN roster API directly
+- normalize the response into the internal player structure
+- use ESPN player IDs as stable sync IDs
+- update existing players
+- insert new players
+- delete players that are no longer present in the imported ESPN roster
+- preserve existing manual ordering for players that already exist in the database
+
+If local image download is enabled:
+
+- headshots are downloaded server-side
+- files are stored under `public/uploads/players/`
+- imported player image paths are rewritten to local paths automatically
+
+This is the recommended default workflow for simple offseason maintenance.
+
+## CSV import
+
 The admin backend supports two import modes:
 
 1. CSV only

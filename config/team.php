@@ -7,6 +7,7 @@ return [
     'nickname' => getenv('TEAM_NICKNAME') ?: 'Seahawks',
     'city' => getenv('TEAM_CITY') ?: 'Seattle',
     'slug' => getenv('TEAM_SLUG') ?: 'seahawks',
+    'espn_id' => getenv('TEAM_ESPN_ID') ?: '',
     'logo_path' => getenv('TEAM_LOGO_PATH') ?: '',
     'tagline' => getenv('TEAM_TAGLINE') ?: 'Build your own 53-man roster before cutdown day.',
     'colors' => [
