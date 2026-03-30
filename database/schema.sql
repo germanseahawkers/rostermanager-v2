@@ -11,6 +11,18 @@ CREATE TABLE IF NOT EXISTS players (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS shares (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(32) NOT NULL UNIQUE,
+    roster_hash CHAR(64) NOT NULL UNIQUE,
+    roster_player_ids TEXT NOT NULL,
+    author VARCHAR(255) DEFAULT '',
+    scheme VARCHAR(50) DEFAULT 'primary',
+    lang VARCHAR(10) DEFAULT 'en',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 INSERT INTO players (name, position, experience, weight_kg, height_cm, image, ordering)
 VALUES
     ('Max Mustermann', 'QB', '3 years', '95', '188', '', 10),

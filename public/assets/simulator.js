@@ -43,6 +43,8 @@
   const userLocale = (navigator.language || state.locale || "en").toLowerCase();
   const usesImperial = userLocale.includes("-us") || userLocale === "en-us";
   state.personalization = state.personalization || { author: "", scheme: "primary", palettes: {} };
+  const shareCache = new Map();
+  let shareRequestId = 0;
 
   function selectedIdsArray() {
     return Array.from(selectedIds).sort((a, b) => a - b);
@@ -77,6 +79,8 @@
   function updateUrlState() {
     const url = new URL(window.location.href);
     const roster = selectedIdsArray().join(",");
+
+    url.searchParams.delete("s");
 
     if (roster) url.searchParams.set("roster", roster);
     else url.searchParams.delete("roster");
@@ -198,6 +202,11 @@
   }
 
   function updateShareLinks() {
+    if (state.shareCreateUrl && state.csrfToken) {
+      void requestShortShareLinks();
+      return;
+    }
+
     const shareUrl = buildShareUrl();
     const cardUrl = new URL(`${state.basePath}/share/card.svg`, window.location.origin);
     cardUrl.searchParams.set("lang", state.locale);
@@ -218,6 +227,82 @@
     sharePageLink.href = shareUrl.toString();
     shareCardLink.href = cardUrl.toString();
     whatsappLink.href = whatsappUrl.toString();
+  }
+
+  function shareFingerprint() {
+    return JSON.stringify({
+      lang: state.locale,
+      roster: selectedIdsArray(),
+      author: state.personalization.author || "",
+      scheme: state.personalization.scheme || "primary",
+    });
+  }
+
+  function applyShareLinks(payload) {
+    const shareUrl = String(payload.share_url || "");
+    const shareCardUrl = String(payload.share_card_url || "");
+    const simulatorUrl = String(payload.simulator_url || "");
+    const whatsappUrl = new URL("https://wa.me/");
+    whatsappUrl.searchParams.set("text", `${state.labels.shareCaption}: ${shareUrl}`);
+
+    shareUrlInput.value = shareUrl;
+    sharePageLink.href = shareUrl;
+    shareCardLink.href = shareCardUrl;
+    whatsappLink.href = whatsappUrl.toString();
+    nativeShareButton?.removeAttribute("disabled");
+    copyLinkButton?.removeAttribute("disabled");
+  }
+
+  async function requestShortShareLinks() {
+    const key = shareFingerprint();
+
+    if (shareCache.has(key)) {
+      applyShareLinks(shareCache.get(key));
+      return;
+    }
+
+    const requestId = ++shareRequestId;
+    shareUrlInput.value = state.labels.shareGenerating || "Generating short link ...";
+    sharePageLink.href = "#";
+    shareCardLink.href = "#";
+    whatsappLink.href = "#";
+    nativeShareButton?.setAttribute("disabled", "disabled");
+    copyLinkButton?.setAttribute("disabled", "disabled");
+
+    try {
+      const payload = new URLSearchParams();
+      payload.set("_token", state.csrfToken);
+      payload.set("lang", state.locale);
+      payload.set("roster", selectedIdsArray().join(","));
+      payload.set("scheme", state.personalization.scheme || "primary");
+
+      if (state.personalization.author) {
+        payload.set("author", state.personalization.author);
+      }
+
+      const response = await fetch(state.shareCreateUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        },
+        body: payload.toString(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Share request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (requestId !== shareRequestId) return;
+
+      shareCache.set(key, data);
+      applyShareLinks(data);
+    } catch (error) {
+      if (requestId !== shareRequestId) return;
+
+      shareUrlInput.value = state.labels.shareUnavailable || "Short link could not be created.";
+    }
   }
 
   function renderGroup() {

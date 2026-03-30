@@ -31,6 +31,8 @@ $simulatorConfig = [
     'rosterLimit' => $simulator['roster_limit'],
     'locale' => $locale,
     'basePath' => $config['app']['base_path'],
+    'shareCreateUrl' => $shareCreateUrl ?? ($config['app']['base_path'] . '/share/create'),
+    'csrfToken' => csrf_token(),
     'labels' => [
         'summaryShort' => $t['summary_short'],
         'selected' => $t['selected_label'],
@@ -44,6 +46,8 @@ $simulatorConfig = [
         'experienceYearPlural' => $t['experience_year_plural'],
         'selectedRoster' => $t['selected_roster'],
         'selectedRosterNamed' => $t['selected_roster_named'],
+        'shareGenerating' => $t['share_generating'],
+        'shareUnavailable' => $t['share_unavailable'],
     ],
     'personalization' => [
         'author' => $author,
@@ -226,11 +230,11 @@ ob_start();
             <div class="share-box">
                 <h3><?= htmlspecialchars($t['share_title'], ENT_QUOTES, 'UTF-8') ?></h3>
                 <p class="muted"><?= htmlspecialchars($t['share_body'], ENT_QUOTES, 'UTF-8') ?></p>
-                <input type="text" readonly data-share-url value="<?= htmlspecialchars($shareUrl . '&roster=' . implode(',', $simulator['selected_ids']), ENT_QUOTES, 'UTF-8') ?>">
+                <input type="text" readonly data-share-url value="<?= htmlspecialchars($t['share_generating'], ENT_QUOTES, 'UTF-8') ?>">
                 <div class="share-actions">
                     <button type="button" data-copy-link><?= htmlspecialchars($t['copy_link'], ENT_QUOTES, 'UTF-8') ?></button>
-                    <a class="button secondary" data-share-page href="<?= htmlspecialchars($shareUrl . '&roster=' . implode(',', $simulator['selected_ids']), ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t['open_share'], ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="button secondary" data-share-card href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/share/card.svg?lang=<?= htmlspecialchars($locale, ENT_QUOTES, 'UTF-8') ?>&roster=<?= htmlspecialchars(implode(',', $simulator['selected_ids']), ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="button secondary" data-share-page href="#"><?= htmlspecialchars($t['open_share'], ENT_QUOTES, 'UTF-8') ?></a>
+                    <a class="button secondary" data-share-card href="#" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
                     <a class="button secondary" data-whatsapp-link href="#"><?= htmlspecialchars($t['share_whatsapp'], ENT_QUOTES, 'UTF-8') ?></a>
                     <button type="button" class="secondary" data-native-share><?= htmlspecialchars($t['share_native'], ENT_QUOTES, 'UTF-8') ?></button>
                 </div>

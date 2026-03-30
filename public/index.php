@@ -34,6 +34,7 @@ $adminController = new AdminPlayerController($database, $config);
 $router->get('/', [$publicController, 'index']);
 $router->get('/share', [$publicController, 'share']);
 $router->get('/share/card.svg', [$publicController, 'shareCard']);
+$router->post('/share/create', [$publicController, 'createShare']);
 $router->get('/login', [$authController, 'showLogin']);
 $router->post('/login', [$authController, 'login']);
 $router->post('/logout', [$authController, 'logout']);
