@@ -248,7 +248,6 @@ ob_start();
                 <div class="share-actions">
                     <button type="button" data-copy-link><?= htmlspecialchars($t['copy_link'], ENT_QUOTES, 'UTF-8') ?></button>
                     <a class="button secondary" data-share-page href="<?= htmlspecialchars(($initialShareLinks['share_url'] ?? '') !== '' ? public_asset_url((string) $initialShareLinks['share_url'], $config) : '#', ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t['open_share'], ENT_QUOTES, 'UTF-8') ?></a>
-                    <a class="button secondary" data-share-card href="<?= htmlspecialchars(($initialShareLinks['share_card_url'] ?? '') !== '' ? public_asset_url((string) $initialShareLinks['share_card_url'], $config) : '#', ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
                     <a class="button secondary" data-whatsapp-link href="#"><?= htmlspecialchars($t['share_whatsapp'], ENT_QUOTES, 'UTF-8') ?></a>
                     <button type="button" class="secondary" data-native-share><?= htmlspecialchars($t['share_native'], ENT_QUOTES, 'UTF-8') ?></button>
                 </div>

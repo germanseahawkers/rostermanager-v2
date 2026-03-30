@@ -30,7 +30,6 @@
   const rosterStatus = root.querySelector("[data-roster-status]");
   const shareUrlInput = root.querySelector("[data-share-url]");
   const sharePageLink = root.querySelector("[data-share-page]");
-  const shareCardLink = root.querySelector("[data-share-card]");
   const whatsappLink = root.querySelector("[data-whatsapp-link]");
   const nativeShareButton = root.querySelector("[data-native-share]");
   const copyLinkButton = root.querySelector("[data-copy-link]");
@@ -220,19 +219,16 @@
 
   function applyShareLinks(payload) {
     const shareUrl = new URL(String(payload.share_url || ""), window.location.origin).toString();
-    const shareCardUrl = new URL(String(payload.share_card_url || ""), window.location.origin).toString();
     const whatsappUrl = new URL("https://wa.me/");
     whatsappUrl.searchParams.set("text", `${state.labels.shareCaption}: ${shareUrl}`);
 
     activeShareLinks = {
       share_url: shareUrl,
-      share_card_url: shareCardUrl,
       simulator_url: new URL(String(payload.simulator_url || ""), window.location.origin).toString(),
       whatsapp_url: whatsappUrl.toString(),
     };
     shareUrlInput.value = shareUrl;
     sharePageLink.href = shareUrl;
-    shareCardLink.href = shareCardUrl;
     whatsappLink.href = whatsappUrl.toString();
   }
 
@@ -240,7 +236,6 @@
     activeShareLinks = null;
     shareUrlInput.value = state.labels.sharePending || "Short link will be created when you share.";
     sharePageLink.href = "#";
-    shareCardLink.href = "#";
     whatsappLink.href = "#";
   }
 
@@ -383,17 +378,6 @@
     try {
       const links = await ensureShareLinks();
       if (links?.share_url) window.location.href = links.share_url;
-    } catch (error) {
-      // Leave the generated error message in the input field.
-    }
-  });
-
-  shareCardLink?.addEventListener("click", async (event) => {
-    event.preventDefault();
-
-    try {
-      const links = await ensureShareLinks();
-      if (links?.share_card_url) window.open(links.share_card_url, "_blank", "noreferrer");
     } catch (error) {
       // Leave the generated error message in the input field.
     }

@@ -10,6 +10,10 @@ $author = $author ?? '';
 $palette = $palette ?? resolve_share_palette('primary', $config, $locale);
 $personalizedTitle = personalized_roster_title($t, $author);
 $clubDescription = trim((string) ($t['club_branding_copy'] ?? ''));
+$shareUrl = trim((string) ($shareUrl ?? ''));
+$shareCardUrl = trim((string) ($shareCardUrl ?? ''));
+$simulatorUrl = trim((string) ($simulatorUrl ?? ''));
+$shareDescription = trim((string) ($t['review_body'] ?? ''));
 
 $formatExperience = static function (mixed $value) use ($t): string {
     $normalized = is_string($value) || is_numeric($value) ? trim((string) $value) : '';
@@ -85,9 +89,12 @@ ob_start();
                 </div>
             </div>
             <div class="share-actions share-hero-actions">
+                <button type="button" class="button secondary" data-copy-link><?= htmlspecialchars($t['copy_link'], ENT_QUOTES, 'UTF-8') ?></button>
+                <a class="button secondary" href="https://wa.me/?text=<?= htmlspecialchars(rawurlencode(($t['share_caption'] ?? '') . ': ' . $shareUrl), ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['share_whatsapp'], ENT_QUOTES, 'UTF-8') ?></a>
+                <button type="button" class="button secondary" data-native-share data-share-url="<?= htmlspecialchars($shareUrl, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t['share_native'], ENT_QUOTES, 'UTF-8') ?></button>
                 <a class="button" href="<?= htmlspecialchars($simulatorUrl, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($t['load_this_roster'], ENT_QUOTES, 'UTF-8') ?></a>
-                <a class="button secondary" href="<?= htmlspecialchars($shareCardUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($t['download_card'], ENT_QUOTES, 'UTF-8') ?></a>
             </div>
+            <p class="hint" data-copy-feedback><?= htmlspecialchars($t['review_hint'], ENT_QUOTES, 'UTF-8') ?></p>
         </div>
     </div>
 </section>
@@ -149,12 +156,52 @@ ob_start();
         </article>
     <?php endforeach; ?>
 </section>
+<script>
+(() => {
+  const copyButton = document.querySelector("[data-copy-link]");
+  const nativeShareButton = document.querySelector("[data-native-share]");
+  const feedback = document.querySelector("[data-copy-feedback]");
+  const shareUrl = nativeShareButton?.getAttribute("data-share-url") || "";
+  const shareText = <?= json_encode($t['share_caption'] ?? '', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+  const copiedLabel = <?= json_encode($t['copy_done'] ?? 'Link copied', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
+  copyButton?.addEventListener("click", async () => {
+    if (!shareUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      if (feedback) feedback.textContent = copiedLabel;
+    } catch (error) {
+      // Ignore clipboard fallback errors on the share page.
+    }
+  });
+
+  nativeShareButton?.addEventListener("click", async () => {
+    if (!navigator.share || !shareUrl) return;
+
+    try {
+      await navigator.share({
+        title: document.title,
+        text: shareText,
+        url: shareUrl,
+      });
+    } catch (error) {
+      // Ignore cancelled share actions.
+    }
+  });
+})();
+</script>
 <?php
 $content = (string) ob_get_clean();
 
 echo App\Core\View::make('layouts/app', [
     'config' => $config,
     'title' => $team['name'] . ' ' . $t['share_page_title'],
+    'metaTitle' => $personalizedTitle,
+    'metaDescription' => $shareDescription,
+    'canonicalUrl' => $shareUrl,
+    'ogImageUrl' => $shareCardUrl,
+    'ogType' => 'article',
     'lang' => $locale,
     'content' => $content,
     'theme' => $config['team']['colors'],

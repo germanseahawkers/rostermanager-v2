@@ -8,6 +8,11 @@ $clubName = trim((string) ($club['name'] ?? ''));
 $clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
 $brandHref = ($config['app']['base_path'] ?? '') . '/';
 $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
+$metaDescription = trim((string) ($metaDescription ?? ''));
+$canonicalUrl = trim((string) ($canonicalUrl ?? ''));
+$ogType = trim((string) ($ogType ?? 'website'));
+$ogImageUrl = trim((string) ($ogImageUrl ?? ''));
+$metaTitle = trim((string) ($metaTitle ?? ($title ?? $config['app']['name'])));
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($lang ?? 'en', ENT_QUOTES, 'UTF-8') ?>">
@@ -15,6 +20,24 @@ $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) :
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($title ?? $config['app']['name'], ENT_QUOTES, 'UTF-8') ?></title>
+    <?php if ($metaDescription !== ''): ?>
+        <meta name="description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8') ?>">
+        <meta property="og:description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8') ?>">
+        <meta name="twitter:description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
+    <?php if ($canonicalUrl !== ''): ?>
+        <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+        <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
+    <meta property="og:type" content="<?= htmlspecialchars($ogType, ENT_QUOTES, 'UTF-8') ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8') ?>">
+    <meta property="og:site_name" content="<?= htmlspecialchars($config['app']['name'], ENT_QUOTES, 'UTF-8') ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8') ?>">
+    <?php if ($ogImageUrl !== ''): ?>
+        <meta property="og:image" content="<?= htmlspecialchars($ogImageUrl, ENT_QUOTES, 'UTF-8') ?>">
+        <meta name="twitter:image" content="<?= htmlspecialchars($ogImageUrl, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
     <style>
         :root {
             --primary: <?= htmlspecialchars($theme['primary'] ?? '#0b2545', ENT_QUOTES, 'UTF-8') ?>;

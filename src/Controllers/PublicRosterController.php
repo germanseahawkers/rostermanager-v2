@@ -77,8 +77,9 @@ final class PublicRosterController
             'simulator' => $simulator,
             'author' => $author,
             'palette' => $palette,
-            'shareCardUrl' => $shareLinks['share_card_url'],
-            'simulatorUrl' => $shareLinks['simulator_url'],
+            'shareUrl' => $this->absoluteUrl($request, $shareLinks['share_url']),
+            'shareCardUrl' => $this->absoluteUrl($request, $shareLinks['share_card_url']),
+            'simulatorUrl' => $this->absoluteUrl($request, $shareLinks['simulator_url']),
         ]));
     }
 
@@ -166,5 +167,14 @@ final class PublicRosterController
             'share_card_url' => $this->config['app']['base_path'] . '/share/card.svg?lang=' . $locale . '&roster=' . $rosterQuery . $personalizationQuery,
             'simulator_url' => $this->config['app']['base_path'] . '/?lang=' . $locale . '&roster=' . $rosterQuery . $personalizationQuery,
         ];
+    }
+
+    private function absoluteUrl(Request $request, string $path): string
+    {
+        if (preg_match('#^https?://#i', $path) === 1) {
+            return $path;
+        }
+
+        return rtrim($request->origin(), '/') . '/' . ltrim($path, '/');
     }
 }

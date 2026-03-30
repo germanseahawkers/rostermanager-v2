@@ -45,6 +45,39 @@ final class Request
         return $_SERVER[$normalizedKey] ?? $default;
     }
 
+    public function scheme(): string
+    {
+        $https = strtolower((string) ($_SERVER['HTTPS'] ?? ''));
+
+        if ($https !== '' && $https !== 'off') {
+            return 'https';
+        }
+
+        $forwardedProto = trim((string) $this->header('X-Forwarded-Proto', ''));
+
+        if ($forwardedProto !== '') {
+            return strtolower(explode(',', $forwardedProto)[0] ?? 'https');
+        }
+
+        return 'http';
+    }
+
+    public function host(): string
+    {
+        $forwardedHost = trim((string) $this->header('X-Forwarded-Host', ''));
+
+        if ($forwardedHost !== '') {
+            return trim(explode(',', $forwardedHost)[0] ?? '');
+        }
+
+        return trim((string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost'));
+    }
+
+    public function origin(): string
+    {
+        return $this->scheme() . '://' . $this->host();
+    }
+
     public function file(string $key): ?array
     {
         return $_FILES[$key] ?? null;
