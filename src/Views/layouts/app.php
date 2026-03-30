@@ -6,7 +6,6 @@ $theme = $theme ?? ($config['team']['colors'] ?? []);
 $club = $config['club'] ?? [];
 $clubName = trim((string) ($club['name'] ?? ''));
 $clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
-$clubTagline = trim((string) ($club['tagline'] ?? ''));
 $brandHref = ($config['app']['base_path'] ?? '') . '/';
 $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
 ?>
@@ -67,8 +66,8 @@ $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) :
                 <?= htmlspecialchars($ui['made_for'], ENT_QUOTES, 'UTF-8') ?>
             <?php endif; ?>
         </span>
-        <?php if ($clubTagline !== ''): ?>
-            <span class="muted"><?= htmlspecialchars($clubTagline, ENT_QUOTES, 'UTF-8') ?></span>
+        <?php if ($clubName !== '' && !empty($ui['club_branding_copy'])): ?>
+            <span class="muted"><?= htmlspecialchars($ui['club_branding_copy'], ENT_QUOTES, 'UTF-8') ?></span>
         <?php endif; ?>
     </div>
 </footer>

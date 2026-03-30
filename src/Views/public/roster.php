@@ -3,7 +3,6 @@
 $team = $config['team'];
 $club = $config['club'] ?? [];
 $clubName = trim((string) ($club['name'] ?? ''));
-$clubTagline = trim((string) ($club['tagline'] ?? ''));
 $clubLogoPath = trim((string) ($club['logo_path'] ?? ''));
 $clubUrl = trim((string) ($club['url'] ?? ''));
 $clubLogoUrl = $clubLogoPath !== '' ? public_asset_url($clubLogoPath, $config) : '';
@@ -11,6 +10,19 @@ $author = $author ?? '';
 $paletteOptions = $paletteOptions ?? [];
 $palette = $palette ?? resolve_share_palette('primary', $config, $locale);
 $personalizedTitle = personalized_roster_title($t, $author);
+$clubDescription = trim((string) ($t['club_branding_copy'] ?? ''));
+$shapeItems = [
+    $t['shape_qb'] ?? '2 Quarterbacks',
+    $t['shape_rb'] ?? '4 Running Backs',
+    $t['shape_wr'] ?? '6 Wide Receivers',
+    $t['shape_te'] ?? '3 Tight Ends',
+    $t['shape_ol'] ?? '9 Offensive Linemen',
+    $t['shape_lb'] ?? '7 Linebackers',
+    $t['shape_cb'] ?? '6 Cornerbacks',
+    $t['shape_s'] ?? '4 Safeties',
+    $t['shape_dl'] ?? '9 Defensive Linemen',
+    $t['shape_st'] ?? '3 Special Teamers',
+];
 
 $simulatorConfig = [
     'players' => $simulator['players'],
@@ -44,49 +56,61 @@ ob_start();
 ?>
 <section class="sim-hero">
     <div class="sim-hero-copy">
-        <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['city']), ENT_QUOTES, 'UTF-8') ?></div>
-        <h1><?= htmlspecialchars($team['name'] . ' ' . $t['headline'], ENT_QUOTES, 'UTF-8') ?></h1>
+        <div class="eyebrow"><?= htmlspecialchars(strtoupper($team['name']), ENT_QUOTES, 'UTF-8') ?></div>
+        <h1><?= htmlspecialchars($t['headline'], ENT_QUOTES, 'UTF-8') ?></h1>
         <p class="lead"><?= htmlspecialchars($t['subline'], ENT_QUOTES, 'UTF-8') ?></p>
         <?php if ($clubName !== ''): ?>
-            <div class="club-note">
+            <<?= $clubUrl !== '' ? 'a' : 'div' ?>
+                class="club-note"
+                <?php if ($clubUrl !== ''): ?>
+                    href="<?= htmlspecialchars($clubUrl, ENT_QUOTES, 'UTF-8') ?>"
+                    target="_blank"
+                    rel="noreferrer"
+                <?php endif; ?>
+            >
                 <?php if ($clubLogoUrl !== ''): ?>
                     <img class="club-note-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>">
                 <?php endif; ?>
                 <div>
                     <strong><?= htmlspecialchars(($t['club_presented_by'] ?? 'Presented by') . ' ' . $clubName, ENT_QUOTES, 'UTF-8') ?></strong>
-                    <?php if ($clubTagline !== ''): ?>
-                        <div class="club-note-copy"><?= htmlspecialchars($clubTagline, ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php if ($clubDescription !== ''): ?>
+                        <div class="club-note-copy"><?= htmlspecialchars($clubDescription, ENT_QUOTES, 'UTF-8') ?></div>
                     <?php endif; ?>
                 </div>
-            </div>
+            </<?= $clubUrl !== '' ? 'a' : 'div' ?>>
         <?php endif; ?>
-        <div class="sim-pills">
-            <span class="pill"><?= htmlspecialchars($t['intro_title'], ENT_QUOTES, 'UTF-8') ?></span>
-            <span class="pill"><?= htmlspecialchars($t['share_title'], ENT_QUOTES, 'UTF-8') ?></span>
-            <span class="pill">Open Source Ready</span>
-        </div>
     </div>
     <div class="card-panel">
-        <?php if ($clubName !== ''): ?>
-            <div class="club-panel-head">
-                <?php if ($clubLogoUrl !== ''): ?>
-                    <img class="club-panel-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>">
-                <?php endif; ?>
-                <div>
-                    <div class="panel-kicker"><?= htmlspecialchars($t['club_presented_by'] ?? 'Presented by', ENT_QUOTES, 'UTF-8') ?></div>
-                    <div class="club-panel-name">
-                        <?php if ($clubUrl !== ''): ?>
-                            <a href="<?= htmlspecialchars($clubUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noreferrer"><?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?></a>
-                        <?php else: ?>
-                            <?= htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8') ?>
-                        <?php endif; ?>
-                    </div>
+        <div class="club-panel-head">
+            <?php if ($clubLogoUrl !== ''): ?>
+                <img class="club-panel-logo" src="<?= htmlspecialchars($clubLogoUrl, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($clubName !== '' ? $clubName : $team['name'], ENT_QUOTES, 'UTF-8') ?>">
+            <?php endif; ?>
+            <div class="club-panel-name"><?= htmlspecialchars($t['intro_title'], ENT_QUOTES, 'UTF-8') ?></div>
+        </div>
+        <p class="muted intro-lead"><?= htmlspecialchars($t['intro_body'], ENT_QUOTES, 'UTF-8') ?></p>
+        <div class="intro-sections">
+            <section class="intro-section">
+                <h3><?= htmlspecialchars($t['intro_build_title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                <p class="muted"><?= htmlspecialchars($t['intro_build_body'], ENT_QUOTES, 'UTF-8') ?></p>
+            </section>
+            <section class="intro-section">
+                <h3><?= htmlspecialchars($t['intro_share_title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                <p class="muted"><?= htmlspecialchars($t['intro_share_body'], ENT_QUOTES, 'UTF-8') ?></p>
+            </section>
+            <section class="intro-section">
+                <h3><?= htmlspecialchars($t['intro_adjust_title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                <p class="muted"><?= htmlspecialchars($t['intro_adjust_body'], ENT_QUOTES, 'UTF-8') ?></p>
+            </section>
+            <section class="intro-section intro-shape">
+                <h3><?= htmlspecialchars($t['intro_shape_title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                <p class="muted"><?= htmlspecialchars($t['intro_shape_body'], ENT_QUOTES, 'UTF-8') ?></p>
+                <div class="intro-shape-grid">
+                    <?php foreach ($shapeItems as $shapeItem): ?>
+                        <div class="intro-shape-item"><?= htmlspecialchars($shapeItem, ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php endforeach; ?>
                 </div>
-            </div>
-        <?php endif; ?>
-        <div class="panel-kicker"><?= htmlspecialchars($t['intro_title'], ENT_QUOTES, 'UTF-8') ?></div>
-        <h2><?= htmlspecialchars($team['nickname'] . ' Cutdown', ENT_QUOTES, 'UTF-8') ?></h2>
-        <p class="muted"><?= htmlspecialchars($t['intro_body'], ENT_QUOTES, 'UTF-8') ?></p>
+            </section>
+        </div>
         <div class="locale-switcher">
             <?php foreach (($availableLocales ?? supported_locales()) as $localeCode => $localeLabel): ?>
                 <a

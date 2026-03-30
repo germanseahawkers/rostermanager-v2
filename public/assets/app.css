@@ -27,7 +27,7 @@ body {
 a { color: inherit; }
 .container { width: min(1380px, calc(100% - 2rem)); margin: 0 auto; }
 .site-header, .site-footer { padding: 1rem 0; }
-.site-header-inner, .site-footer-inner, .nav, .actions, .locale-switcher, .share-actions, .sim-pills {
+.site-header-inner, .site-footer-inner, .nav, .actions, .locale-switcher, .share-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -88,14 +88,17 @@ a { color: inherit; }
 .sim-hero-copy h1 {
   margin: 0.4rem 0 0;
   font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 0.98;
+  line-height: 1.02;
+  max-width: 10ch;
+  text-wrap: balance;
 }
 
 .lead {
   margin-top: 1rem;
-  max-width: 55ch;
+  max-width: 42rem;
   color: rgba(247, 251, 255, 0.78);
   font-size: 1.05rem;
+  text-wrap: pretty;
 }
 .club-note {
   display: inline-flex;
@@ -106,6 +109,14 @@ a { color: inherit; }
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+.club-note:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 .club-note-logo, .club-panel-logo {
   width: 44px;
@@ -133,12 +144,37 @@ a { color: inherit; }
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 .club-panel-name {
   font-family: "Space Grotesk", "Segoe UI", sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.45rem;
   font-weight: 700;
+}
+.intro-lead {
+  margin: 0 0 1rem;
+}
+.intro-sections {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.intro-section h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.02rem;
+}
+.intro-section p {
+  margin: 0;
+}
+.intro-shape-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 0.9rem;
+  margin-top: 0.8rem;
+}
+.intro-shape-item {
+  font-weight: 600;
+  color: var(--ink);
 }
 .sim-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
 .sim-main { display: grid; gap: 1.25rem; width: 100%; min-width: 0; }
@@ -430,4 +466,5 @@ th, td {
   .metric-grid, .review-grid { grid-template-columns: 1fr; }
   .personalize-grid { grid-template-columns: 1fr; }
   .review-head-meta { justify-items: start; }
+  .intro-shape-grid { grid-template-columns: 1fr; }
 }
