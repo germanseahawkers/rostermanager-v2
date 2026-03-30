@@ -11,6 +11,7 @@ $paletteOptions = $paletteOptions ?? [];
 $palette = $palette ?? resolve_share_palette('primary', $config, $locale);
 $personalizedTitle = personalized_roster_title($t, $author);
 $clubDescription = trim((string) ($t['club_branding_copy'] ?? ''));
+$shareToken = trim((string) ($initialShareLinks['token'] ?? ''));
 $shapeItems = [
     $t['shape_qb'] ?? '2 Quarterbacks',
     $t['shape_rb'] ?? '4 Running Backs',
@@ -108,9 +109,15 @@ ob_start();
         </div>
         <div class="locale-switcher">
             <?php foreach (($availableLocales ?? supported_locales()) as $localeCode => $localeLabel): ?>
+                <?php
+                $localeHref = $config['app']['base_path'] . '/?lang=' . rawurlencode($localeCode);
+                if ($shareToken !== '') {
+                    $localeHref .= '&s=' . rawurlencode($shareToken);
+                }
+                ?>
                 <a
                     class="button<?= $localeCode === $locale ? '' : ' secondary' ?>"
-                    href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/?lang=<?= htmlspecialchars($localeCode, ENT_QUOTES, 'UTF-8') ?>"
+                    href="<?= htmlspecialchars($localeHref, ENT_QUOTES, 'UTF-8') ?>"
                 ><?= htmlspecialchars($localeLabel, ENT_QUOTES, 'UTF-8') ?></a>
             <?php endforeach; ?>
         </div>

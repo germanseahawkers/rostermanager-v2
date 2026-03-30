@@ -147,11 +147,13 @@ final class PublicRosterController
     private function buildShareLinks(?string $token, string $locale, array $selectedIds, string $author, string $scheme): array
     {
         if ($token !== null && $token !== '') {
+            $localeQuery = '&lang=' . rawurlencode($locale);
+
             return [
                 'token' => $token,
-                'share_url' => $this->config['app']['base_path'] . '/share?s=' . rawurlencode($token),
-                'share_card_url' => $this->config['app']['base_path'] . '/share/card.svg?s=' . rawurlencode($token),
-                'simulator_url' => $this->config['app']['base_path'] . '/?s=' . rawurlencode($token),
+                'share_url' => $this->config['app']['base_path'] . '/share?s=' . rawurlencode($token) . $localeQuery,
+                'share_card_url' => $this->config['app']['base_path'] . '/share/card.svg?s=' . rawurlencode($token) . $localeQuery,
+                'simulator_url' => $this->config['app']['base_path'] . '/?s=' . rawurlencode($token) . $localeQuery,
             ];
         }
 
