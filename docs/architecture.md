@@ -2,54 +2,52 @@
 
 ## Overview
 
-`rostermanager-v2` is a lightweight PHP/MySQL application for NFL fan projects.
+`RosterManager v2` is a lightweight PHP/MySQL application for NFL fan communities.
 
-The current product is built around two connected surfaces:
+The current product combines four main areas:
 
 - a public 90-to-53 roster cut simulator
-- a protected admin backend for maintaining player data
+- a shareable personalized roster page
+- a protected admin backend for player maintenance
+- an ESPN-based import pipeline for ongoing roster sync
 
-The codebase intentionally avoids a full-stack framework. Instead, it uses a small custom application structure with explicit routing, simple controllers, PDO-based repositories, and server-rendered PHP views. That keeps deployment straightforward on classic shared hosting and Plesk-style environments while still preserving a clear separation of responsibilities.
+The codebase intentionally avoids a full-stack framework. It uses a small custom application structure with explicit routing, PDO repositories, shared helper functions, server-rendered views, and a small amount of vanilla JavaScript.
 
-## Design goals
+## Goals
 
 The architecture is optimized for:
 
-- simple deployment without Node.js or a build pipeline
-- team-specific rebranding through configuration
-- low operational overhead for fan club maintainers
-- predictable imports and admin workflows
-- shareable public output without requiring persistent user accounts
-
-This project is meant to be adapted by other NFL fan communities, so branding, copy, position grouping, and roster limits are driven by configuration rather than hard-coded Seahawks-only assumptions.
+- simple deployment on classic PHP hosting
+- easy rebranding for different fan clubs and NFL teams
+- low operational overhead
+- predictable import behavior
+- link-based sharing without user accounts
+- minimal runtime dependencies
 
 ## Runtime stack
 
 - PHP 8.2+
 - MySQL or MariaDB
-- PDO for database access
-- server-rendered HTML views
+- PDO
 - session-based authentication for admin access
-- small vanilla JavaScript for simulator interactivity
+- server-rendered HTML templates
+- vanilla JavaScript for simulator interactions
 
-There is no ORM, no frontend framework, and no background worker layer.
+There is no ORM, no SPA frontend, and no background worker layer.
 
 ## Request flow
 
-The runtime request path is intentionally simple:
+The runtime path is deliberately simple:
 
-1. `public/index.php` bootstraps the application
-2. the custom router resolves the route
+1. [`public/index.php`](../public/index.php) boots the app
+2. [`src/Core/Router.php`](../src/Core/Router.php) resolves the route
 3. a controller handles the request
-4. repositories load or mutate data
-5. helpers assemble view models and shared formatting
-6. a PHP template renders the response
+4. repositories and helpers load or transform data
+5. a PHP view renders the response
 
-The core bootstrapping and HTTP primitives live in:
+Core infrastructure lives in:
 
-- [`public/index.php`](../public/index.php)
 - [`src/Core/App.php`](../src/Core/App.php)
-- [`src/Core/Router.php`](../src/Core/Router.php)
 - [`src/Core/Request.php`](../src/Core/Request.php)
 - [`src/Core/Response.php`](../src/Core/Response.php)
 - [`src/Core/View.php`](../src/Core/View.php)
@@ -57,61 +55,100 @@ The core bootstrapping and HTTP primitives live in:
 - [`src/Core/Session.php`](../src/Core/Session.php)
 - [`src/Core/Env.php`](../src/Core/Env.php)
 
-## Main application areas
+## Public application surface
 
-### Public simulator
+The public surface is handled by [`src/Controllers/PublicRosterController.php`](../src/Controllers/PublicRosterController.php).
 
-The public simulator is handled by [`src/Controllers/PublicRosterController.php`](../src/Controllers/PublicRosterController.php).
+It is responsible for:
 
-Its responsibilities are:
+- locale resolution
+- loading saved share tokens
+- restoring simulator state from a saved share
+- resolving personalized palette variants
+- generating the simulator page
+- generating the share page
+- creating share tokens
+- rendering the legacy SVG share asset
 
-- resolve the requested locale
-- parse roster selection from the query string
-- parse personalization settings such as custom author name and share palette
-- load players from the database
-- build a grouped simulator payload
-- render the simulator page, share page, or SVG share card
+### Simulator page
 
-The simulator itself is mostly server-rendered, with JavaScript used for:
+The simulator page is rendered in [`src/Views/public/roster.php`](../src/Views/public/roster.php) and enhanced by [`public/assets/simulator.js`](../public/assets/simulator.js).
 
-- toggling selected players
+JavaScript is used for:
+
+- switching active position groups
+- selecting and deselecting players
 - updating counts in place
-- keeping the selection in the URL
-- updating share links
-- applying local personalization preview state
+- updating personalized preview state
+- lazily creating short share links only when a share action is triggered
 
-Relevant files:
+The browser URL no longer mutates live during selection. A persistent link is created only when the user explicitly shares.
 
-- [`src/Views/public/roster.php`](../src/Views/public/roster.php)
-- [`src/Views/public/share.php`](../src/Views/public/share.php)
-- [`public/assets/simulator.js`](../public/assets/simulator.js)
-- [`public/assets/app.css`](../public/assets/app.css)
+### Share page
 
-### Admin backend
+The share page is rendered in [`src/Views/public/share.php`](../src/Views/public/share.php).
 
-The admin area is intentionally minimal and uses a single session-protected login.
+It reuses the saved roster state and shows:
 
-It currently supports:
+- personalized headline
+- club-branded hero area
+- quick share actions
+- grouped roster sections with expandable player lists
 
-- player CRUD
-- CSV roster import
-- optional ZIP upload for local player images
-- ID-based roster sync for offseason maintenance
+The share page also provides social metadata through [`src/Views/layouts/app.php`](../src/Views/layouts/app.php), including:
 
-Relevant files:
+- `canonical`
+- Open Graph title, description and image
+- Twitter card metadata
+
+Social previews currently use the club logo from `CLUB_LOGO_PATH` as the primary preview image.
+
+## Share architecture
+
+Sharing is database-backed rather than purely query-string based.
+
+The relevant persistence lives in [`src/Repositories/ShareRepository.php`](../src/Repositories/ShareRepository.php).
+
+A share stores:
+
+- roster player IDs
+- locale
+- author name
+- selected share palette
+- short token
+
+The flow is:
+
+1. simulator posts the current state to `POST /share/create`
+2. backend creates or reuses a short token
+3. share URL becomes `/?s=TOKEN` or `/share?s=TOKEN`
+4. simulator and share page can both restore state from the token
+
+This keeps URLs short and stable while preserving personalization.
+
+## Admin backend
+
+The admin side is handled by:
 
 - [`src/Controllers/AuthController.php`](../src/Controllers/AuthController.php)
 - [`src/Controllers/AdminPlayerController.php`](../src/Controllers/AdminPlayerController.php)
-- [`src/Services/AuthService.php`](../src/Services/AuthService.php)
 - [`src/Middleware/AuthMiddleware.php`](../src/Middleware/AuthMiddleware.php)
 - [`src/Views/auth/login.php`](../src/Views/auth/login.php)
 - [`src/Views/admin/players/index.php`](../src/Views/admin/players/index.php)
 
+Current admin capabilities:
+
+- login/logout
+- player CRUD
+- CSV import
+- CSV + ZIP import for local player photos
+- direct ESPN import
+
 ## Data model
 
-The core persistent entity is `players`.
+The main persistent entity is `players`.
 
-The current player model stores:
+Important player fields:
 
 - `id`
 - `name`
@@ -122,172 +159,94 @@ The current player model stores:
 - `image`
 - `ordering`
 
-Important design decisions:
+Design decisions:
 
-- `position` is the single canonical football position field
-- `ordering` is only a manual display-order field
-- imported player images may either stay as external URLs or be rewritten to local upload paths
-- ESPN IDs can be used as stable primary keys for repeat imports
+- `position` is the only canonical football position field
+- simulator grouping is derived from configured aliases, not stored separately
+- `ordering` is a manual display-order field, not a football rule
+- `image` can be either an external URL or a local upload path
+- ESPN player IDs can serve as stable sync IDs
 
-Schema files:
+The short-link model is stored separately in `shares`.
+
+Schema and migrations live in:
 
 - [`database/schema.sql`](../database/schema.sql)
 - [`database/migrate_players_to_metric_columns.sql`](../database/migrate_players_to_metric_columns.sql)
+- [`database/migrate_add_shares_table.sql`](../database/migrate_add_shares_table.sql)
 
 ## Repository layer
 
-Database access is deliberately explicit.
+Data access is explicit and close to SQL.
 
-[`src/Repositories/PlayerRepository.php`](../src/Repositories/PlayerRepository.php) is responsible for:
+Main repositories:
 
-- loading all players for public and admin screens
-- creating players
-- updating players
-- deleting players
-- handling sync-style imports where IDs determine update vs. insert behavior
+- [`src/Repositories/PlayerRepository.php`](../src/Repositories/PlayerRepository.php)
+- [`src/Repositories/ShareRepository.php`](../src/Repositories/ShareRepository.php)
 
-This project keeps SQL close to the repository layer instead of spreading database queries across controllers or views.
+This keeps database logic out of controllers and avoids hidden ORM behavior.
 
 ## Configuration model
 
-Configuration is split into two top-level concepts:
+Configuration is split into two branding layers plus runtime settings.
 
-- application/runtime configuration
-- team and club branding configuration
-
-### Application configuration
+### App/runtime configuration
 
 [`config/app.php`](../config/app.php) reads:
 
 - app name
 - base path
 - debug mode
-- database credentials
+- database settings
 - admin credentials
-- club branding values
+- club branding
 
 ### Team configuration
 
 [`config/team.php`](../config/team.php) contains:
 
-- team name, city, nickname, slug
+- team identity
 - logo path
-- tagline
-- theme colors
+- ESPN team ID
 - roster limit
-- position group mapping and aliases
+- position group aliases
+- theme colors
 
-### Club branding
+### Club configuration
 
-The app also supports a second branding layer for the publishing fan club via:
+The fan-club publisher is configured separately through:
 
 - `CLUB_NAME`
 - `CLUB_LOGO_PATH`
-- `CLUB_TAGLINE`
 - `CLUB_URL`
+- optional club tagline/copy inputs
 
-This allows the simulator to distinguish between:
+This makes it possible to run a Seahawks-themed simulator that is clearly published by a separate club organization.
 
-- the NFL team being simulated
-- the fan club or organization publishing the project
+## Theming and palettes
 
-## Branding and theming
+The main UI theme comes from `TEAM_COLOR_*` values in `.env`.
 
-The visual system is driven by environment-configurable team colors:
-
-- `TEAM_COLOR_PRIMARY`
-- `TEAM_COLOR_SECONDARY`
-- `TEAM_COLOR_SURFACE`
-- `TEAM_COLOR_SURFACE_ALT`
-- `TEAM_COLOR_TEXT`
-- `TEAM_COLOR_INK`
-- `TEAM_COLOR_MUTED`
-- `TEAM_COLOR_LINE`
-
-These values flow into:
-
-- the base layout theme
-- simulator styling
-- share page styling
-- derived share palettes for personalized roster cards
-
-The personalized share palettes are no longer hard-coded to Seahawks-specific labels. Instead, the app derives three generic variants from the configured team palette:
+The personalized preview/share palettes are derived from those base colors rather than requiring a second full palette configuration. The app currently exposes three variants:
 
 - primary
 - secondary
 - neutral
 
-That keeps setup simple for other teams and fan clubs.
-
-## Simulator grouping model
-
-Simulator grouping is configuration-driven.
-
-Each player still has exactly one `position`, but the simulator groups positions through aliases defined in [`config/team.php`](../config/team.php).
-
-Examples:
-
-- `OT`, `OG`, `C`, `G`, and `T` roll up into `OL`
-- `DE`, `DT`, and `NT` roll up into `DL`
-- `K`, `PK`, `P`, and `LS` roll up into `ST`
-
-This gives the application a stable public simulator structure while still allowing imports to preserve real football positions.
-
-## Share architecture
-
-The share system is stateless and query-string based.
-
-The current share state is defined by:
-
-- selected player IDs in `roster`
-- locale in `lang`
-- optional custom author name in `author`
-- optional share palette in `scheme`
-
-That state powers:
-
-- the public simulator URL
-- the share page
-- the SVG share graphic
-
-The share card renderer lives in [`src/Support/helpers.php`](../src/Support/helpers.php) and produces SVG server-side, which avoids needing a browser-based screenshot pipeline.
-
-## Import architecture
-
-Roster import is intentionally split into two stages:
-
-1. fetch and normalize roster data locally
-2. upload the result through the admin backend
-
-### Local importer
-
-[`scripts/import_roster.py`](../scripts/import_roster.py) reads from the ESPN roster API and can:
-
-- fetch by team slug
-- emit CSV for admin upload
-- optionally download player headshots
-- optionally generate a ZIP archive of those images
-- write ESPN IDs into the CSV for sync-safe reimports
-
-### Admin import
-
-The admin import supports two main modes:
-
-- plain CSV import
-- CSV + ZIP import for local images
-
-If every CSV row contains an `id`, the import switches into sync mode:
-
-- existing IDs are updated
-- missing IDs are deleted
-- new IDs are created
-- existing manual `ordering` values are preserved on updates
-
-This makes offseason roster maintenance much easier than full wipe-and-recreate imports.
+These variants are used in the simulator preview and on the share page.
 
 ## Localization
 
-The public UI supports:
+Translations are centralized in [`src/Support/helpers.php`](../src/Support/helpers.php).
+
+Locale resolution follows this order:
+
+1. explicit `lang` in the URL
+2. saved share locale
+3. browser `Accept-Language`
+4. fallback to `en`
+
+Supported locales currently include:
 
 - German
 - English
@@ -295,62 +254,72 @@ The public UI supports:
 - French
 - Portuguese
 
-Localization is handled through the shared translation helper in [`src/Support/helpers.php`](../src/Support/helpers.php). Locale selection happens via the `lang` query parameter, and unsupported locales fall back to English.
+## Simulator grouping model
 
-Position-group labels remain configuration-driven and are resolved through the simulator grouping map.
+Players are grouped for the simulator through aliases defined in [`config/team.php`](../config/team.php).
 
-## Static and uploaded assets
+Examples:
 
-There are two asset classes in the project:
+- `OT`, `OG`, `C`, `G`, `T` -> `OL`
+- `DE`, `DT`, `NT` -> `DL`
+- `K`, `PK`, `P`, `LS` -> `ST`
 
-### Bundled assets
+This lets imports preserve real source positions while the public simulator stays readable.
 
-- CSS
-- JavaScript
-- optional static logos under `public/`
+## Import architecture
 
-### Uploaded assets
+There are three import paths:
 
-- player images stored under `public/uploads/players/`
+### Admin ESPN import
 
-The app can work with both remote image URLs and local upload paths, which keeps the deployment flexible.
+The primary workflow. The admin enters an ESPN team ID and PHP:
 
-## Current directory layout
+- fetches the roster from ESPN
+- normalizes the payload
+- syncs by ESPN player ID
+- updates existing players
+- inserts new players
+- removes missing players
+- preserves manual ordering
 
-- [`public/`](../public/) public web root, routing entry point, CSS and JavaScript
-- [`src/Core/`](../src/Core/) framework-like primitives
-- [`src/Controllers/`](../src/Controllers/) HTTP-facing application logic
-- [`src/Repositories/`](../src/Repositories/) SQL-backed persistence
-- [`src/Services/`](../src/Services/) focused business services such as auth
-- [`src/Middleware/`](../src/Middleware/) route protection
-- [`src/Views/`](../src/Views/) server-rendered templates
-- [`src/Support/helpers.php`](../src/Support/helpers.php) shared formatting, simulator assembly, import helpers, share rendering
-- [`config/`](../config/) app, team, and club configuration
-- [`database/`](../database/) schema, migrations, and generated import files
-- [`scripts/`](../scripts/) local data import tooling
-- [`docs/`](../docs/) project documentation
+Optional image download stores local files in `public/uploads/players/`.
 
-## Intentional non-goals
+### CLI ESPN import
 
-The current architecture intentionally does not include:
+[`scripts/import_espn.php`](../scripts/import_espn.php) runs the same sync flow from the command line and is intended for cron-based roster maintenance.
 
-- a full CMS
-- user accounts or multi-user permissions
-- persistent public roster submissions
-- a background queue system
-- a JavaScript SPA frontend
-- automatic crawler-targeted OG image rendering beyond the existing share card endpoint
+### Local CSV preparation
 
-These may be added later, but the current architecture is deliberately biased toward simplicity and maintainability.
+[`scripts/import_roster.py`](../scripts/import_roster.py) can still be used when maintainers want a local CSV and optional image ZIP before import.
 
-## Recommended direction for future growth
+## Image handling
 
-If the project grows further, the most natural extensions would be:
+Player images can be handled in two ways:
 
-- saved named rosters in the database
-- season-aware team and roster management
-- multiple admin accounts
-- richer social metadata and preview handling
-- optional API endpoints for external clients
+- leave external URLs untouched
+- download and store local copies
 
-For now, the current architecture is intentionally small, explicit, and easy to rebrand, which fits the project goal well.
+For local image mode, imports:
+
+- store files in `public/uploads/players/`
+- reuse existing local images on later syncs
+- remove files no longer referenced after a successful sync
+
+This prevents duplicate downloads while keeping the upload directory clean.
+
+## Current limitations
+
+- no automated test suite yet
+- no background queue layer
+- no PNG-based dynamic social card generator
+- social previews currently rely on the club logo instead of a per-roster rendered image
+
+## Extension points
+
+The current structure leaves room for:
+
+- additional leagues or teams
+- richer admin analytics
+- a real social-card image pipeline
+- bulk edit tools
+- stronger validation or automated tests
