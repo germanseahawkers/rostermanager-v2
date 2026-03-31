@@ -32,7 +32,7 @@ $metaTitle = trim((string) ($metaTitle ?? ($title ?? $config['app']['name'])));
     <meta property="og:type" content="<?= htmlspecialchars($ogType, ENT_QUOTES, 'UTF-8') ?>">
     <meta property="og:title" content="<?= htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8') ?>">
     <meta property="og:site_name" content="<?= htmlspecialchars($config['app']['name'], ENT_QUOTES, 'UTF-8') ?>">
-    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="<?= htmlspecialchars($metaTitle, ENT_QUOTES, 'UTF-8') ?>">
     <?php if ($ogImageUrl !== ''): ?>
         <meta property="og:image" content="<?= htmlspecialchars($ogImageUrl, ENT_QUOTES, 'UTF-8') ?>">
