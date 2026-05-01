@@ -121,6 +121,8 @@ function translations(string $locale): array
         'de' => [
             'nav_roster' => 'Simulator',
             'nav_admin' => 'Admin',
+            'nav_imprint' => 'Impressum',
+            'nav_privacy' => 'Datenschutz',
             'headline' => '53-Mann Roster-Simulator',
             'subline' => 'Baue aus dem 90-Mann-Kader deinen eigenen finalen Cutdown-Roster und verfolge live, wie dein Seahawks-Kader Form annimmt.',
             'intro_title' => 'Seahawks Cutdown',
@@ -196,6 +198,8 @@ function translations(string $locale): array
         'en' => [
             'nav_roster' => 'Simulator',
             'nav_admin' => 'Admin',
+            'nav_imprint' => 'Imprint',
+            'nav_privacy' => 'Privacy',
             'headline' => '53-Man Roster Simulator',
             'subline' => 'Build your own final cutdown roster from the full 90-man camp squad and follow every move as your Seahawks roster comes together.',
             'intro_title' => 'Seahawks Cutdown',
@@ -271,6 +275,8 @@ function translations(string $locale): array
         'es' => [
             'nav_roster' => 'Simulador',
             'nav_admin' => 'Admin',
+            'nav_imprint' => 'Aviso legal',
+            'nav_privacy' => 'Privacidad',
             'headline' => 'Simulador del roster de 53 jugadores',
             'subline' => 'Crea tu roster final de recortes a partir del plantel completo de 90 jugadores y sigue en vivo cómo toma forma tu equipo de Seattle.',
             'intro_title' => 'Seahawks Cutdown',
@@ -346,6 +352,8 @@ function translations(string $locale): array
         'fr' => [
             'nav_roster' => 'Simulateur',
             'nav_admin' => 'Admin',
+            'nav_imprint' => 'Mentions légales',
+            'nav_privacy' => 'Confidentialité',
             'headline' => 'Simulateur d’effectif à 53 joueurs',
             'subline' => 'Compose ton effectif final à partir du groupe complet de 90 joueurs et suis en direct la construction de ton roster des Seahawks.',
             'intro_title' => 'Seahawks Cutdown',
@@ -421,6 +429,8 @@ function translations(string $locale): array
         'pt' => [
             'nav_roster' => 'Simulador',
             'nav_admin' => 'Admin',
+            'nav_imprint' => 'Aviso legal',
+            'nav_privacy' => 'Privacidade',
             'headline' => 'Simulador do elenco de 53 jogadores',
             'subline' => 'Monte o seu elenco final de cortes a partir do grupo completo de 90 jogadores e acompanhe ao vivo como o seu roster dos Seahawks ganha forma.',
             'intro_title' => 'Seahawks Cutdown',

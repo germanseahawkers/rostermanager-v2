@@ -80,6 +80,8 @@ $metaTitle = trim((string) ($metaTitle ?? ($title ?? $config['app']['name'])));
         <nav class="nav footer-nav">
             <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/"><?= htmlspecialchars($ui['nav_roster'], ENT_QUOTES, 'UTF-8') ?></a>
             <a href="<?= htmlspecialchars($config['app']['base_path'], ENT_QUOTES, 'UTF-8') ?>/admin/players"><?= htmlspecialchars($ui['nav_admin'], ENT_QUOTES, 'UTF-8') ?></a>
+            <a href="https://www.germanseahawkers.com/impressum/" target="_blank" rel="noreferrer"><?= htmlspecialchars($ui['nav_imprint'], ENT_QUOTES, 'UTF-8') ?></a>
+            <a href="https://www.germanseahawkers.com/datenschutzerklaerung/" target="_blank" rel="noreferrer"><?= htmlspecialchars($ui['nav_privacy'], ENT_QUOTES, 'UTF-8') ?></a>
         </nav>
         <span class="muted">
             <?php if ($clubName !== ''): ?>
