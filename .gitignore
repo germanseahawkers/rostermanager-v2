@@ -1,6 +1,5 @@
 .DS_Store
-/storage/uploads/*
-!/storage/uploads/.gitkeep
+/.env
 /public/uploads/players/*
 !/public/uploads/players/.gitkeep
 /database/imports/*.csv
