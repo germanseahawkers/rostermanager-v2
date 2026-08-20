@@ -1184,7 +1184,6 @@ function fetch_remote_content(string $url): string
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_TIMEOUT => 30,
-            CURLOPT_USERAGENT => 'RosterManager v2 ESPN Import',
             CURLOPT_FAILONERROR => false,
         ]);
 
@@ -1193,19 +1192,9 @@ function fetch_remote_content(string $url): string
         $error = curl_error($handle);
         curl_close($handle);
 
-        if (!is_string($body) || $body === '') {
-            throw new RuntimeException(sprintf(
-                'The remote request to %s returned an empty response.%s',
-                $url,
-                $error !== '' ? ' ' . $error : ''
-            ));
+        if (is_string($body) && $body !== '' && $status >= 200 && $status < 300) {
+            return $body;
         }
-
-        if ($status < 200 || $status >= 300) {
-            throw new RuntimeException(sprintf('The remote request to %s failed with HTTP %d.', $url, $status));
-        }
-
-        return $body;
     }
 
     $context = stream_context_create([
@@ -1213,7 +1202,6 @@ function fetch_remote_content(string $url): string
             'method' => 'GET',
             'timeout' => 30,
             'ignore_errors' => true,
-            'header' => "User-Agent: RosterManager v2 ESPN Import\r\n",
         ],
     ]);
 
@@ -1222,7 +1210,11 @@ function fetch_remote_content(string $url): string
     $statusLine = is_array($headers) && isset($headers[0]) ? (string) $headers[0] : '';
 
     if (!is_string($body) || $body === '') {
-        throw new RuntimeException(sprintf('The remote request to %s returned an empty response.', $url));
+        throw new RuntimeException(sprintf(
+            'The remote request to %s returned an empty response.%s',
+            $url,
+            isset($error) && $error !== '' ? ' ' . $error : ''
+        ));
     }
 
     if ($statusLine !== '' && preg_match('/\s(\d{3})\s/', $statusLine, $matches) === 1) {
