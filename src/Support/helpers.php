@@ -1172,14 +1172,6 @@ function public_asset_url(string $path, array $config): string
 
 function fetch_remote_content(string $url): string
 {
-    $headers = [
-        'Accept: application/json, text/plain, */*',
-        'Accept-Language: en-US,en;q=0.9,de;q=0.8',
-        'Cache-Control: no-cache',
-        'Pragma: no-cache',
-        'Referer: https://www.espn.com/',
-    ];
-
     if (function_exists('curl_init')) {
         $handle = curl_init($url);
 
@@ -1192,9 +1184,7 @@ function fetch_remote_content(string $url): string
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_TIMEOUT => 30,
-            CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; RosterManager/2.0; +https://roster.germanseahawkers.com/)',
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_ENCODING => '',
+            CURLOPT_USERAGENT => 'RosterManager v2 ESPN Import',
             CURLOPT_FAILONERROR => false,
         ]);
 
@@ -1223,10 +1213,7 @@ function fetch_remote_content(string $url): string
             'method' => 'GET',
             'timeout' => 30,
             'ignore_errors' => true,
-            'header' => implode("\r\n", array_merge(
-                ['User-Agent: Mozilla/5.0 (compatible; RosterManager/2.0; +https://roster.germanseahawkers.com/)'],
-                $headers
-            )) . "\r\n",
+            'header' => "User-Agent: RosterManager v2 ESPN Import\r\n",
         ],
     ]);
 
