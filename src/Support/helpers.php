@@ -1172,6 +1172,14 @@ function public_asset_url(string $path, array $config): string
 
 function fetch_remote_content(string $url): string
 {
+    $headers = [
+        'Accept: application/json, text/plain, */*',
+        'Accept-Language: en-US,en;q=0.9,de;q=0.8',
+        'Cache-Control: no-cache',
+        'Pragma: no-cache',
+        'Referer: https://www.espn.com/',
+    ];
+
     if (function_exists('curl_init')) {
         $handle = curl_init($url);
 
@@ -1184,7 +1192,9 @@ function fetch_remote_content(string $url): string
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_TIMEOUT => 30,
-            CURLOPT_USERAGENT => 'RosterManager v2 ESPN Import',
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; RosterManager/2.0; +https://roster.germanseahawkers.com/)',
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_ENCODING => '',
             CURLOPT_FAILONERROR => false,
         ]);
 
@@ -1194,11 +1204,15 @@ function fetch_remote_content(string $url): string
         curl_close($handle);
 
         if (!is_string($body) || $body === '') {
-            throw new RuntimeException('The remote request returned an empty response.' . ($error !== '' ? ' ' . $error : ''));
+            throw new RuntimeException(sprintf(
+                'The remote request to %s returned an empty response.%s',
+                $url,
+                $error !== '' ? ' ' . $error : ''
+            ));
         }
 
         if ($status < 200 || $status >= 300) {
-            throw new RuntimeException(sprintf('The remote request failed with HTTP %d.', $status));
+            throw new RuntimeException(sprintf('The remote request to %s failed with HTTP %d.', $url, $status));
         }
 
         return $body;
@@ -1209,7 +1223,10 @@ function fetch_remote_content(string $url): string
             'method' => 'GET',
             'timeout' => 30,
             'ignore_errors' => true,
-            'header' => "User-Agent: RosterManager v2 ESPN Import\r\n",
+            'header' => implode("\r\n", array_merge(
+                ['User-Agent: Mozilla/5.0 (compatible; RosterManager/2.0; +https://roster.germanseahawkers.com/)'],
+                $headers
+            )) . "\r\n",
         ],
     ]);
 
@@ -1218,14 +1235,14 @@ function fetch_remote_content(string $url): string
     $statusLine = is_array($headers) && isset($headers[0]) ? (string) $headers[0] : '';
 
     if (!is_string($body) || $body === '') {
-        throw new RuntimeException('The remote request returned an empty response.');
+        throw new RuntimeException(sprintf('The remote request to %s returned an empty response.', $url));
     }
 
     if ($statusLine !== '' && preg_match('/\s(\d{3})\s/', $statusLine, $matches) === 1) {
         $status = (int) $matches[1];
 
         if ($status < 200 || $status >= 300) {
-            throw new RuntimeException(sprintf('The remote request failed with HTTP %d.', $status));
+            throw new RuntimeException(sprintf('The remote request to %s failed with HTTP %d.', $url, $status));
         }
     }
 
@@ -1291,10 +1308,16 @@ function import_espn_roster_rows(array $payload, bool $downloadImages, array $ex
                 if (local_player_image_exists($existingImage)) {
                     $image = $existingImage;
                 } else {
-                    $contents = fetch_remote_content($image);
-                    $basename = basename((string) parse_url($image, PHP_URL_PATH));
-                    $image = store_imported_player_image_contents($contents, $basename !== '' ? $basename : ($id . '.png'));
-                    $storedPaths[] = $image;
+                    try {
+                        $contents = fetch_remote_content($image);
+                        $basename = basename((string) parse_url($image, PHP_URL_PATH));
+                        $image = store_imported_player_image_contents($contents, $basename !== '' ? $basename : ($id . '.png'));
+                        $storedPaths[] = $image;
+                    } catch (\Throwable $exception) {
+                        if ($existingImage !== '') {
+                            $image = $existingImage;
+                        }
+                    }
                 }
             }
 
