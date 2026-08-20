@@ -38,6 +38,7 @@ When triggered, PHP will:
 
 - fetch the ESPN roster endpoint
 - normalize the JSON payload
+- skip `injuredReserveOrOut`, `suspended`, and `practiceSquad`
 - sync by ESPN player ID
 - update existing players
 - create new players

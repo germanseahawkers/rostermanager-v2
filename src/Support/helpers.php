@@ -1254,9 +1254,19 @@ function import_espn_roster_rows(array $payload, bool $downloadImages, array $ex
     $storedPaths = [];
     $seenIds = [];
     $ordering = 10;
+    $excludedSections = [
+        'injuredReserveOrOut' => true,
+        'practiceSquad' => true,
+        'suspended' => true,
+    ];
 
     foreach (($payload['athletes'] ?? []) as $section) {
         if (!is_array($section) || !isset($section['items']) || !is_array($section['items'])) {
+            continue;
+        }
+
+        $sectionKey = trim((string) ($section['position'] ?? ''));
+        if ($sectionKey !== '' && isset($excludedSections[$sectionKey])) {
             continue;
         }
 
